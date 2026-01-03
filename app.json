@@ -1,57 +1,56 @@
+
 {
   "expo": {
     "name": "Intentional",
     "slug": "intentional-dating",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/final_quest_240x240.png",
-    "scheme": "intentional",
+    "icon": "./assets/images/c16dda65-bb0d-4cb6-ba78-d87103621eb0.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/final_quest_240x240.png",
+      "image": "./assets/images/c16dda65-bb0d-4cb6-ba78-d87103621eb0.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#1a1a2e"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.intentional.dating"
+      "bundleIdentifier": "com.intentional.dating",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "We need access to your camera to take profile photos",
+        "NSPhotoLibraryUsageDescription": "We need access to your photo library to select profile photos"
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/final_quest_240x240.png",
-        "backgroundColor": "#000000"
+        "foregroundImage": "./assets/images/c16dda65-bb0d-4cb6-ba78-d87103621eb0.png",
+        "backgroundColor": "#1a1a2e"
       },
-      "package": "com.intentional.dating"
+      "edgeToEdgeEnabled": true,
+      "package": "com.intentional.dating",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/final_quest_240x240.png"
+      "favicon": "./assets/images/c16dda65-bb0d-4cb6-ba78-d87103621eb0.png",
+      "bundler": "metro"
     },
     "plugins": [
+      "expo-font",
       "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "backgroundColor": "#000000",
-          "image": "./assets/images/final_quest_240x240.png",
-          "imageWidth": 200
-        }
-      ]
+      "expo-web-browser",
+      "expo-av"
     ],
+    "scheme": "intentional",
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "your-project-id"
-      },
-      "apiUrl": "http://localhost:3000",
-      "backendUrl": "https://erm5magsz6azuge4mtdkxhsmzj7uqr45.app.specular.dev"
+      "router": {}
     }
   }
 }

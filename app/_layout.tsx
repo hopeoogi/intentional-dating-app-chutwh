@@ -2,11 +2,12 @@
 import "react-native-reanimated";
 import React, { useEffect } from "react";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { SystemBars } from "react-native-edge-to-edge";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useColorScheme } from "react-native";
+import { useColorScheme, Alert } from "react-native";
+import { useNetworkState } from "expo-network";
 import {
   DarkTheme,
   DefaultTheme,
@@ -14,17 +15,17 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { BACKEND_URL, healthCheck } from "@/utils/api";
+import { WidgetProvider } from "@/contexts/WidgetContext";
 
 SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
-  initialRouteName: "index",
+  initialRouteName: "welcome",
 };
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const networkState = useNetworkState();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
@@ -35,26 +36,38 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  useEffect(() => {
-    // Log backend URL and perform health check on app startup
-    console.log('[App] Backend URL configured:', BACKEND_URL);
-    healthCheck().then((healthy) => {
-      if (healthy) {
-        console.log('[App] Backend is reachable ✓');
-      } else {
-        console.warn('[App] Backend health check failed - API calls may fail');
-      }
-    });
-  }, []);
+  React.useEffect(() => {
+    if (
+      !networkState.isConnected &&
+      networkState.isInternetReachable === false
+    ) {
+      Alert.alert(
+        "🔌 You are offline",
+        "You can keep using the app! Your changes will be saved locally and synced when you are back online."
+      );
+    }
+  }, [networkState.isConnected, networkState.isInternetReachable]);
 
   if (!loaded) {
     return null;
   }
 
+  const CustomDefaultTheme: Theme = {
+    ...DefaultTheme,
+    dark: false,
+    colors: {
+      primary: "rgb(0, 122, 255)",
+      background: "rgb(242, 242, 247)",
+      card: "rgb(255, 255, 255)",
+      text: "rgb(0, 0, 0)",
+      border: "rgb(216, 216, 220)",
+      notification: "rgb(255, 59, 48)",
+    },
+  };
+
   const CustomDarkTheme: Theme = {
     ...DarkTheme,
     colors: {
-      ...DarkTheme.colors,
       primary: "rgb(10, 132, 255)",
       background: "rgb(1, 1, 1)",
       card: "rgb(28, 28, 30)",
@@ -66,17 +79,53 @@ export default function RootLayout() {
 
   return (
     <>
-      <StatusBar style="light" animated />
-      <ThemeProvider value={CustomDarkTheme}>
-        <AuthProvider>
-          <GestureHandlerRootView style={{ flex: 1 }}>
+      <StatusBar style="auto" animated />
+      <ThemeProvider
+        value={colorScheme === "dark" ? CustomDarkTheme : CustomDefaultTheme}
+      >
+        <WidgetProvider>
+          <GestureHandlerRootView>
             <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="waitlist" />
+              {/* Welcome video screen */}
+              <Stack.Screen name="welcome" />
+              
+              {/* Waitlist screens */}
+              <Stack.Screen name="waitlist/application" />
+              <Stack.Screen name="waitlist/pending" />
+
+              {/* Main app with tabs */}
+              <Stack.Screen name="(tabs)" />
+
+              {/* Modal Demo Screens */}
+              <Stack.Screen
+                name="modal"
+                options={{
+                  presentation: "modal",
+                  title: "Standard Modal",
+                  headerShown: true,
+                }}
+              />
+              <Stack.Screen
+                name="formsheet"
+                options={{
+                  presentation: "formSheet",
+                  title: "Form Sheet Modal",
+                  headerShown: true,
+                  sheetGrabberVisible: true,
+                  sheetAllowedDetents: [0.5, 0.8, 1.0],
+                  sheetCornerRadius: 20,
+                }}
+              />
+              <Stack.Screen
+                name="transparent-modal"
+                options={{
+                  presentation: "transparentModal",
+                }}
+              />
             </Stack>
-            <SystemBars style="light" />
+            <SystemBars style={"auto"} />
           </GestureHandlerRootView>
-        </AuthProvider>
+        </WidgetProvider>
       </ThemeProvider>
     </>
   );
