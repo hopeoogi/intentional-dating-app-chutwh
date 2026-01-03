@@ -8,6 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 
@@ -24,33 +25,43 @@ export default function WelcomeScreen() {
 
   return (
     <ImageBackground
-      source={require('@/assets/images/82196be8-c746-4098-bde7-ba2a1ac38be6.jpeg')}
-      style={styles.container}
+      source={require('@/assets/images/59a13fdc-a3e0-4396-83c9-c31643d8b4a7.jpeg')}
+      style={styles.background}
       resizeMode="cover"
     >
-      <View style={styles.overlay}>
-        <Text style={styles.title}>Intentional</Text>
-      </View>
+      <LinearGradient
+        colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.7)']}
+        style={styles.overlay}
+      >
+        <View style={styles.container}>
+          <Text style={styles.appName}>Intentional</Text>
+        </View>
+      </LinearGradient>
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
     width: width,
     height: height,
   },
   overlay: {
     flex: 1,
+  },
+  container: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
-  title: {
-    fontSize: 48,
-    fontWeight: '300',
+  appName: {
+    fontSize: 56,
+    fontWeight: '700',
     color: '#FFFFFF',
-    letterSpacing: 2,
+    letterSpacing: 3,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 10,
   },
 });
