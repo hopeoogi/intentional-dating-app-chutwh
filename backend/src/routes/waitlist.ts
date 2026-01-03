@@ -5,9 +5,12 @@ import * as schema from '../db/schema.js';
 import type { App } from '../index.js';
 
 interface WaitlistApplicationRequest {
-  name: string;
+  firstName: string;
+  lastName: string;
   age: number;
-  location: string;
+  city: string;
+  provinceState: string;
+  country: string;
   email: string;
   phone?: string;
   lookingFor: string[];
@@ -31,12 +34,21 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
   ): Promise<any | void> => {
     const body = request.body as WaitlistApplicationRequest;
 
-    // Validate name
-    if (!body.name || typeof body.name !== 'string' || body.name.trim() === '') {
+    // Validate firstName
+    if (!body.firstName || typeof body.firstName !== 'string' || body.firstName.trim() === '') {
       return reply.status(400).send({
         error: 'Validation error',
-        field: 'name',
-        message: 'Name is required and must be a non-empty string',
+        field: 'firstName',
+        message: 'firstName is required and must be a non-empty string',
+      });
+    }
+
+    // Validate lastName
+    if (!body.lastName || typeof body.lastName !== 'string' || body.lastName.trim() === '') {
+      return reply.status(400).send({
+        error: 'Validation error',
+        field: 'lastName',
+        message: 'lastName is required and must be a non-empty string',
       });
     }
 
@@ -57,12 +69,30 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
       });
     }
 
-    // Validate location
-    if (!body.location || typeof body.location !== 'string' || body.location.trim() === '') {
+    // Validate city
+    if (!body.city || typeof body.city !== 'string' || body.city.trim() === '') {
       return reply.status(400).send({
         error: 'Validation error',
-        field: 'location',
-        message: 'Location is required and must be a non-empty string',
+        field: 'city',
+        message: 'City is required and must be a non-empty string',
+      });
+    }
+
+    // Validate provinceState
+    if (!body.provinceState || typeof body.provinceState !== 'string' || body.provinceState.trim() === '') {
+      return reply.status(400).send({
+        error: 'Validation error',
+        field: 'provinceState',
+        message: 'provinceState is required and must be a non-empty string',
+      });
+    }
+
+    // Validate country
+    if (!body.country || typeof body.country !== 'string' || body.country.trim() === '') {
+      return reply.status(400).send({
+        error: 'Validation error',
+        field: 'country',
+        message: 'Country is required and must be a non-empty string',
       });
     }
 
@@ -75,12 +105,12 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
       });
     }
 
-    // Validate lookingFor (must be array with at least 1 item)
-    if (!Array.isArray(body.lookingFor) || body.lookingFor.length === 0) {
+    // Validate lookingFor (must be array with 1-5 items)
+    if (!Array.isArray(body.lookingFor) || body.lookingFor.length === 0 || body.lookingFor.length > 5) {
       return reply.status(400).send({
         error: 'Validation error',
         field: 'lookingFor',
-        message: 'lookingFor is required and must be an array with at least 1 item',
+        message: 'lookingFor is required and must be an array with 1-5 items',
       });
     }
 
@@ -117,9 +147,12 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
         .insert(schema.waitlistApplications)
         .values({
           id: applicationId,
-          name: body.name.trim(),
+          firstName: body.firstName.trim(),
+          lastName: body.lastName.trim(),
           age: body.age,
-          location: body.location.trim(),
+          city: body.city.trim(),
+          provinceState: body.provinceState.trim(),
+          country: body.country.trim(),
           email: body.email.toLowerCase().trim(),
           phone: body.phone?.trim(),
           lookingFor: body.lookingFor.map((item) => item.trim()),
@@ -133,7 +166,8 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
         message: 'Application submitted successfully',
         application: {
           id: application.id,
-          name: application.name,
+          firstName: application.firstName,
+          lastName: application.lastName,
           email: application.email,
           status: application.status,
           createdAt: application.createdAt,
