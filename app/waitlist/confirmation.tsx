@@ -1,90 +1,111 @@
 
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { useRouter } from 'expo-router';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { IconSymbol } from '@/components/IconSymbol';
 
 export default function ConfirmationScreen() {
   const router = useRouter();
 
   return (
-    <LinearGradient colors={['#1a1a1a', '#000000']} style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <LinearGradient colors={['#1a1a2e', '#16213e']} style={styles.gradient}>
         <View style={styles.content}>
-          <View style={styles.iconContainer}>
-            <IconSymbol 
-              ios_icon_name="checkmark.circle.fill" 
-              android_material_icon_name="check-circle" 
-              size={80} 
-              color="#FFFFFF" 
-            />
+          <Image
+            source={require('@/assets/images/9d78a159-4b83-473c-a4f1-55affbc6fcf0.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+
+          <View style={styles.checkmarkContainer}>
+            <Text style={styles.checkmark}>✓</Text>
           </View>
 
-          <Text style={styles.title}>Application Received</Text>
-          
+          <Text style={styles.title}>Application Received!</Text>
+
           <Text style={styles.message}>
-            Your application is being processed and you are on the waitlist. Please be patient, we will contact you when your application is approved.
+            Your application has been successfully received and you are now in our waitlist. We will contact you when your application has been approved.
           </Text>
 
           <TouchableOpacity
             style={styles.button}
             onPress={() => router.replace('/auth/sign-in')}
           >
-            <Text style={styles.buttonText}>Done</Text>
+            <Text style={styles.buttonText}>Return to Sign In</Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
-    </LinearGradient>
+      </LinearGradient>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#1a1a2e',
   },
-  safeArea: {
+  gradient: {
     flex: 1,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40,
+    padding: 32,
   },
-  iconContainer: {
-    marginBottom: 30,
+  logo: {
+    width: 100,
+    height: 100,
+    marginBottom: 32,
+  },
+  checkmarkContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+    borderWidth: 3,
+    borderColor: '#4CAF50',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  checkmark: {
+    fontSize: 48,
+    color: '#4CAF50',
+    fontWeight: 'bold',
   },
   title: {
-    fontSize: 32,
-    fontWeight: '300',
-    color: '#FFFFFF',
-    marginBottom: 20,
-    letterSpacing: 0.5,
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 16,
   },
   message: {
     fontSize: 16,
-    color: '#CCCCCC',
+    color: '#aaa',
     textAlign: 'center',
     lineHeight: 24,
-    marginBottom: 50,
+    marginBottom: 48,
   },
   button: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#e94560',
+    borderRadius: 12,
     paddingVertical: 16,
-    paddingHorizontal: 60,
-    borderRadius: 30,
-    shadowColor: '#FFFFFF',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    paddingHorizontal: 48,
+    minWidth: 200,
+    alignItems: 'center',
   },
   buttonText: {
-    color: '#000000',
-    fontSize: 18,
-    fontWeight: '600',
-    letterSpacing: 0.5,
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
   },
 });

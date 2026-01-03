@@ -1,8 +1,15 @@
 
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Dimensions,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
@@ -20,22 +27,24 @@ export default function WelcomeScreen() {
   return (
     <View style={styles.container}>
       <Image
-        source={require('@/assets/images/27d3b11a-a9a5-4cb0-b6d1-8f0bdab61047.jpeg')}
+        source={require('@/assets/images/bff591c7-1a37-488d-8849-202d0eebec7f.jpeg')}
         style={styles.backgroundImage}
         resizeMode="cover"
       />
       <LinearGradient
-        colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.6)']}
+        colors={['rgba(26, 26, 46, 0.7)', 'rgba(22, 33, 62, 0.9)']}
         style={styles.overlay}
-      />
-      <View style={styles.content}>
-        <Image
-          source={require('@/assets/images/fe27da58-f92e-44ef-87bb-ba6254bd415c.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-        <Text style={styles.title}>Intentional</Text>
-      </View>
+      >
+        <SafeAreaView style={styles.content} edges={['top', 'bottom']}>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require('@/assets/images/9d78a159-4b83-473c-a4f1-55affbc6fcf0.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
     </View>
   );
 }
@@ -43,7 +52,7 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#1a1a2e',
   },
   backgroundImage: {
     position: 'absolute',
@@ -51,24 +60,18 @@ const styles = StyleSheet.create({
     height: height,
   },
   overlay: {
-    position: 'absolute',
-    width: width,
-    height: height,
+    flex: 1,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  logo: {
-    width: 120,
-    height: 120,
-    marginBottom: 20,
+  logoContainer: {
+    alignItems: 'center',
   },
-  title: {
-    fontSize: 42,
-    fontWeight: '600',
-    color: '#fff',
-    letterSpacing: 1,
+  logo: {
+    width: 150,
+    height: 150,
   },
 });

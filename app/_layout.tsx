@@ -2,7 +2,7 @@
 import "react-native-reanimated";
 import React, { useEffect } from "react";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { SystemBars } from "react-native-edge-to-edge";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -19,17 +19,15 @@ import { WidgetProvider } from "@/contexts/WidgetContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BACKEND_URL, healthCheck } from "@/utils/api";
 
+// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-// Log backend configuration at app startup
-console.log('='.repeat(60));
-console.log('🚀 App Starting - Backend Configuration');
-console.log('='.repeat(60));
-console.log('Backend URL:', BACKEND_URL || '❌ NOT CONFIGURED');
-console.log('='.repeat(60));
+// Log backend URL on app startup
+console.log('[App] Backend URL configured:', BACKEND_URL);
+console.log('[App] Backend URL is', BACKEND_URL ? 'SET ✓' : 'NOT SET ✗');
 
 export const unstable_settings = {
-  initialRouteName: "index",
+  initialRouteName: "(tabs)", // Ensure any route can link back to `/`
 };
 
 export default function RootLayout() {
@@ -46,9 +44,9 @@ export default function RootLayout() {
       // Perform backend health check on app startup
       healthCheck().then((isHealthy) => {
         if (isHealthy) {
-          console.log('✅ Backend is reachable and healthy');
+          console.log('[App] Backend connection verified ✓');
         } else {
-          console.warn('⚠️ Backend health check failed - some features may not work');
+          console.warn('[App] Backend health check failed - API may be unavailable');
         }
       });
     }
@@ -74,41 +72,53 @@ export default function RootLayout() {
     ...DefaultTheme,
     dark: false,
     colors: {
-      primary: "rgb(0, 122, 255)",
-      background: "rgb(242, 242, 247)",
-      card: "rgb(255, 255, 255)",
-      text: "rgb(0, 0, 0)",
-      border: "rgb(216, 216, 220)",
-      notification: "rgb(255, 59, 48)",
+      primary: "rgb(0, 122, 255)", // System Blue
+      background: "rgb(242, 242, 247)", // Light mode background
+      card: "rgb(255, 255, 255)", // White cards/surfaces
+      text: "rgb(0, 0, 0)", // Black text for light mode
+      border: "rgb(216, 216, 220)", // Light gray for separators/borders
+      notification: "rgb(255, 59, 48)", // System Red
     },
   };
 
   const CustomDarkTheme: Theme = {
     ...DarkTheme,
     colors: {
-      primary: "rgb(10, 132, 255)",
-      background: "rgb(1, 1, 1)",
-      card: "rgb(28, 28, 30)",
-      text: "rgb(255, 255, 255)",
-      border: "rgb(44, 44, 46)",
-      notification: "rgb(255, 69, 58)",
+      primary: "rgb(10, 132, 255)", // System Blue (Dark Mode)
+      background: "rgb(1, 1, 1)", // True black background for OLED displays
+      card: "rgb(28, 28, 30)", // Dark card/surface color
+      text: "rgb(255, 255, 255)", // White text for dark mode
+      border: "rgb(44, 44, 46)", // Dark gray for separators/borders
+      notification: "rgb(255, 69, 58)", // System Red (Dark Mode)
     },
   };
-
   return (
     <>
       <StatusBar style="auto" animated />
-      <ThemeProvider
-        value={colorScheme === "dark" ? CustomDarkTheme : CustomDefaultTheme}
-      >
-        <AuthProvider>
-          <WidgetProvider>
-            <GestureHandlerRootView>
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="index" />
-                <Stack.Screen name="waitlist" />
-                <Stack.Screen name="auth" />
-                <Stack.Screen name="(tabs)" />
+        <ThemeProvider
+          value={colorScheme === "dark" ? CustomDarkTheme : CustomDefaultTheme}
+        >
+          <AuthProvider>
+            <WidgetProvider>
+              <GestureHandlerRootView>
+              <Stack>
+                {/* Main app with tabs */}
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+                {/* Auth screens */}
+                <Stack.Screen name="auth" options={{ headerShown: false }} />
+
+                {/* Waitlist screens */}
+                <Stack.Screen name="waitlist" options={{ headerShown: false }} />
+
+                {/* Chat screen */}
+                <Stack.Screen name="chat/[id]" options={{ headerShown: false }} />
+
+                {/* OAuth callback screens */}
+                <Stack.Screen name="auth-callback" options={{ headerShown: false }} />
+                <Stack.Screen name="auth-popup" options={{ headerShown: false }} />
+
+                {/* Modal Demo Screens */}
                 <Stack.Screen
                   name="modal"
                   options={{
@@ -135,10 +145,10 @@ export default function RootLayout() {
                 />
               </Stack>
               <SystemBars style={"auto"} />
-            </GestureHandlerRootView>
-          </WidgetProvider>
-        </AuthProvider>
-      </ThemeProvider>
+              </GestureHandlerRootView>
+            </WidgetProvider>
+          </AuthProvider>
+        </ThemeProvider>
     </>
   );
 }

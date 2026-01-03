@@ -1,7 +1,7 @@
 
 import { Stack } from 'expo-router';
 
-export default function WaitlistLayout() {
+export default function AuthLayout() {
   return (
     <Stack
       screenOptions={{
@@ -9,8 +9,9 @@ export default function WaitlistLayout() {
         animation: 'slide_from_right',
       }}
     >
-      <Stack.Screen name="application" />
-      <Stack.Screen name="confirmation" />
+      <Stack.Screen name="sign-in" />
+      <Stack.Screen name="sign-up" />
+      <Stack.Screen name="profile-setup" />
     </Stack>
   );
 }
