@@ -1,41 +1,48 @@
 
 import React from 'react';
-import { useRouter } from 'expo-router';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import { IconSymbol } from '@/components/IconSymbol';
 
 export default function ConfirmationScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Image
-          source={require('@/assets/images/intentional-logo.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <LinearGradient
+        colors={['#1a1a1a', '#0a0a0a']}
+        style={styles.gradient}
+      >
+        <View style={styles.content}>
+          <View style={styles.iconContainer}>
+            <IconSymbol 
+              ios_icon_name="checkmark.circle.fill" 
+              android_material_icon_name="check-circle" 
+              size={80} 
+              color="#4CAF50" 
+            />
+          </View>
 
-        <View style={styles.messageContainer}>
-          <Text style={styles.title}>Success!</Text>
+          <Text style={styles.title}>You&apos;re on the list!</Text>
+          
           <Text style={styles.message}>
-            Thank you for joining our waitlist! We review all applications and when you are approved we will contact you!
+            Thank you for applying to join our exclusive community of intentional connections.
           </Text>
-        </View>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => router.push('/waitlist/sign-in')}
-        >
-          <Text style={styles.buttonText}>Go back to Sign Up</Text>
-        </TouchableOpacity>
-      </View>
+          <Text style={styles.submessage}>
+            We&apos;ll review your application and get back to you soon via email.
+          </Text>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => router.replace('/')}
+          >
+            <Text style={styles.buttonText}>Done</Text>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
     </SafeAreaView>
   );
 }
@@ -43,48 +50,52 @@ export default function ConfirmationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: '#000',
+  },
+  gradient: {
+    flex: 1,
   },
   content: {
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40,
-    paddingVertical: 60,
+    padding: 24,
   },
-  logo: {
-    width: 200,
-    height: 80,
-    marginTop: 40,
-  },
-  messageContainer: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
+  iconContainer: {
+    marginBottom: 32,
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 20,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 16,
+    textAlign: 'center',
   },
   message: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 18,
+    color: '#ccc',
     textAlign: 'center',
+    marginBottom: 12,
+    lineHeight: 26,
+  },
+  submessage: {
+    fontSize: 16,
+    color: '#999',
+    textAlign: 'center',
+    marginBottom: 48,
     lineHeight: 24,
   },
   button: {
-    backgroundColor: '#000',
+    backgroundColor: '#fff',
+    borderRadius: 12,
     paddingVertical: 16,
-    paddingHorizontal: 40,
-    borderRadius: 30,
-    width: '100%',
+    paddingHorizontal: 48,
+    minWidth: 200,
     alignItems: 'center',
-    marginBottom: 40,
   },
   buttonText: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#000',
   },
 });
