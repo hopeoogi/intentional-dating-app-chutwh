@@ -1,51 +1,51 @@
 
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { View, Text, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
+    backgroundColor: '#000',
+  },
+  gradient: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 32,
+    padding: 32,
   },
-  logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 32,
+  icon: {
+    fontSize: 64,
+    marginBottom: 24,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '700',
-    color: '#ffffff',
+    color: '#fff',
     textAlign: 'center',
     marginBottom: 16,
   },
   message: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#999',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 28,
   },
 });
 
 export default function ConfirmationScreen() {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <StatusBar style="light" />
-      <Image
-        source={require('@/assets/images/ab20ad44-8729-4a6f-86c6-a7356bbf7036.png')}
-        style={styles.logo}
-        resizeMode="contain"
-      />
-      <Text style={styles.title}>Application Received</Text>
-      <Text style={styles.message}>
-        Your application is being processed and you are on the waitlist.{'\n\n'}
-        We will contact you when your application is approved.
-      </Text>
+      <LinearGradient colors={['#000', '#1a1a1a']} style={styles.gradient}>
+        <Text style={styles.icon}>✓</Text>
+        <Text style={styles.title}>Application Received</Text>
+        <Text style={styles.message}>
+          Your application is being processed and you are on the waitlist. We will contact you when your application is approved.
+        </Text>
+      </LinearGradient>
     </SafeAreaView>
   );
 }

@@ -16,8 +16,17 @@ import {
 } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { WidgetProvider } from "@/contexts/WidgetContext";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { BACKEND_URL, healthCheck } from "@/utils/api";
 
 SplashScreen.preventAutoHideAsync();
+
+// Log backend configuration at app startup
+console.log('='.repeat(60));
+console.log('🚀 App Starting - Backend Configuration');
+console.log('='.repeat(60));
+console.log('Backend URL:', BACKEND_URL || '❌ NOT CONFIGURED');
+console.log('='.repeat(60));
 
 export const unstable_settings = {
   initialRouteName: "index",
@@ -33,6 +42,15 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
+      
+      // Perform backend health check on app startup
+      healthCheck().then((isHealthy) => {
+        if (isHealthy) {
+          console.log('✅ Backend is reachable and healthy');
+        } else {
+          console.warn('⚠️ Backend health check failed - some features may not work');
+        }
+      });
     }
   }, [loaded]);
 
@@ -76,49 +94,51 @@ export default function RootLayout() {
       notification: "rgb(255, 69, 58)",
     },
   };
-  
+
   return (
     <>
       <StatusBar style="auto" animated />
-        <ThemeProvider
-          value={colorScheme === "dark" ? CustomDarkTheme : CustomDefaultTheme}
-        >
+      <ThemeProvider
+        value={colorScheme === "dark" ? CustomDarkTheme : CustomDefaultTheme}
+      >
+        <AuthProvider>
           <WidgetProvider>
             <GestureHandlerRootView>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="waitlist/application" />
-              <Stack.Screen name="waitlist/confirmation" />
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen
-                name="modal"
-                options={{
-                  presentation: "modal",
-                  title: "Standard Modal",
-                }}
-              />
-              <Stack.Screen
-                name="formsheet"
-                options={{
-                  presentation: "formSheet",
-                  title: "Form Sheet Modal",
-                  sheetGrabberVisible: true,
-                  sheetAllowedDetents: [0.5, 0.8, 1.0],
-                  sheetCornerRadius: 20,
-                }}
-              />
-              <Stack.Screen
-                name="transparent-modal"
-                options={{
-                  presentation: "transparentModal",
-                  headerShown: false,
-                }}
-              />
-            </Stack>
-            <SystemBars style={"auto"} />
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="waitlist" />
+                <Stack.Screen name="auth" />
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen
+                  name="modal"
+                  options={{
+                    presentation: "modal",
+                    title: "Standard Modal",
+                  }}
+                />
+                <Stack.Screen
+                  name="formsheet"
+                  options={{
+                    presentation: "formSheet",
+                    title: "Form Sheet Modal",
+                    sheetGrabberVisible: true,
+                    sheetAllowedDetents: [0.5, 0.8, 1.0],
+                    sheetCornerRadius: 20,
+                  }}
+                />
+                <Stack.Screen
+                  name="transparent-modal"
+                  options={{
+                    presentation: "transparentModal",
+                    headerShown: false,
+                  }}
+                />
+              </Stack>
+              <SystemBars style={"auto"} />
             </GestureHandlerRootView>
           </WidgetProvider>
-        </ThemeProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </>
   );
 }

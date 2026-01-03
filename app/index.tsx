@@ -1,97 +1,76 @@
 
-import { View, StyleSheet, Image, Text, ActivityIndicator } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Image, Text, StyleSheet, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
+import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
-import React, { useRef, useState } from 'react';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#1a1a1a',
-  },
-  video: {
-    width: '100%',
-    height: '100%',
-  },
-  logoOverlay: {
-    position: 'absolute',
-    top: '45%',
-    alignSelf: 'center',
-    width: 120,
-    height: 120,
-  },
-  loadingContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#1a1a1a',
-  },
-  loadingText: {
-    color: '#fff',
-    fontSize: 16,
-    marginTop: 16,
-    fontWeight: '500',
-  },
-});
+const { width, height } = Dimensions.get('window');
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const videoRef = useRef<Video>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
-  const handlePlaybackStatusUpdate = (status: AVPlaybackStatus) => {
-    if (status.isLoaded) {
-      if (isLoading) {
-        setIsLoading(false);
-      }
-      if (status.didJustFinish) {
-        console.log('Video finished, navigating to application');
-        router.replace('/waitlist/application');
-      }
-    }
-  };
+  useEffect(() => {
+    // Navigate to waitlist application after 3 seconds
+    const timer = setTimeout(() => {
+      router.replace('/waitlist/application');
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
       
-      {/* Using a stock video URL from Pexels - couple on a date in NYC evening */}
-      <Video
-        ref={videoRef}
-        source={{ uri: 'https://videos.pexels.com/video-files/5473821/5473821-uhd_2560_1440_25fps.mp4' }}
-        style={styles.video}
-        resizeMode={ResizeMode.COVER}
-        shouldPlay
-        isLooping={false}
-        onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-        onError={(error) => {
-          console.error('Video error:', error);
-          // If video fails to load, navigate after 3 seconds
-          setTimeout(() => {
-            router.replace('/waitlist/application');
-          }, 3000);
-        }}
+      {/* Background Image - loaded from local assets for fast loading */}
+      <Image
+        source={require('@/assets/images/1a782e7d-0165-4270-bbc7-3a0d29c7b7d7.jpeg')}
+        style={styles.backgroundImage}
+        resizeMode="cover"
       />
       
-      {/* Logo Overlay */}
-      <Image
-        source={require('@/assets/images/ab20ad44-8729-4a6f-86c6-a7356bbf7036.png')}
-        style={styles.logoOverlay}
-        resizeMode="contain"
+      {/* Dark overlay for better text visibility */}
+      <LinearGradient
+        colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.7)']}
+        style={styles.overlay}
       />
-
-      {/* Loading Indicator */}
-      {isLoading && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#fff" />
-          <Text style={styles.loadingText}>Preparing your experience...</Text>
-        </View>
-      )}
+      
+      {/* Company Name */}
+      <View style={styles.contentContainer}>
+        <Text style={styles.appName}>Intentional</Text>
+      </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  backgroundImage: {
+    position: 'absolute',
+    width,
+    height,
+  },
+  overlay: {
+    position: 'absolute',
+    width,
+    height,
+  },
+  contentContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  appName: {
+    fontSize: 52,
+    fontWeight: '700',
+    color: '#fff',
+    letterSpacing: 3,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 12,
+  },
+});
