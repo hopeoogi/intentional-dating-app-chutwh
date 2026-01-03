@@ -7,8 +7,8 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
 } from 'react-native';
+import { IconSymbol } from '@/components/IconSymbol';
 
 export default function ConfirmationScreen() {
   const router = useRouter();
@@ -16,11 +16,15 @@ export default function ConfirmationScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Image
-          source={require('@/assets/images/intentional-logo.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+        <View style={styles.logoContainer}>
+          <IconSymbol 
+            ios_icon_name="checkmark.circle.fill" 
+            android_material_icon_name="check-circle" 
+            size={80} 
+            color="#4CAF50" 
+          />
+          <Text style={styles.brandName}>Intentional</Text>
+        </View>
 
         <View style={styles.messageContainer}>
           <Text style={styles.title}>Success!</Text>
@@ -52,10 +56,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     paddingVertical: 60,
   },
-  logo: {
-    width: 200,
-    height: 80,
+  logoContainer: {
+    alignItems: 'center',
     marginTop: 40,
+  },
+  brandName: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#000',
+    marginTop: 16,
+    letterSpacing: 1,
   },
   messageContainer: {
     alignItems: 'center',
