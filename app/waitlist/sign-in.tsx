@@ -36,6 +36,10 @@ export default function SignInScreen() {
               resizeMode="contain"
             />
             
+            <Text style={styles.description}>
+              Join our exclusive community of Intentional connections. No likes or swipes anymore, no more being ghosted, only genuine relationships
+            </Text>
+            
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={styles.joinButton}
@@ -74,6 +78,16 @@ const styles = StyleSheet.create({
     width: width * 0.6,
     height: 120,
     marginTop: 40,
+  },
+  description: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '400',
+    textAlign: 'center',
+    lineHeight: 24,
+    paddingHorizontal: 20,
+    marginTop: -80,
+    letterSpacing: 0.3,
   },
   buttonContainer: {
     width: '100%',
