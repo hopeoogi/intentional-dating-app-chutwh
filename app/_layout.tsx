@@ -22,12 +22,8 @@ import { BACKEND_URL, healthCheck } from "@/utils/api";
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-// Log backend URL on app startup
-console.log('[App] Backend URL configured:', BACKEND_URL);
-console.log('[App] Backend URL is', BACKEND_URL ? 'SET ✓' : 'NOT SET ✗');
-
 export const unstable_settings = {
-  initialRouteName: "(tabs)", // Ensure any route can link back to `/`
+  initialRouteName: "waitlist/welcome",
 };
 
 export default function RootLayout() {
@@ -40,15 +36,27 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
-      
-      // Perform backend health check on app startup
-      healthCheck().then((isHealthy) => {
+    }
+  }, [loaded]);
+
+  // Backend health check
+  useEffect(() => {
+    const checkBackend = async () => {
+      try {
+        console.log('🔍 Checking backend health at:', BACKEND_URL);
+        const isHealthy = await healthCheck();
         if (isHealthy) {
-          console.log('[App] Backend connection verified ✓');
+          console.log('✅ Backend is healthy and ready');
         } else {
-          console.warn('[App] Backend health check failed - API may be unavailable');
+          console.warn('⚠️ Backend health check failed');
         }
-      });
+      } catch (error) {
+        console.error('❌ Backend health check error:', error);
+      }
+    };
+
+    if (loaded) {
+      checkBackend();
     }
   }, [loaded]);
 
@@ -72,53 +80,53 @@ export default function RootLayout() {
     ...DefaultTheme,
     dark: false,
     colors: {
-      primary: "rgb(0, 122, 255)", // System Blue
-      background: "rgb(242, 242, 247)", // Light mode background
-      card: "rgb(255, 255, 255)", // White cards/surfaces
-      text: "rgb(0, 0, 0)", // Black text for light mode
-      border: "rgb(216, 216, 220)", // Light gray for separators/borders
-      notification: "rgb(255, 59, 48)", // System Red
+      primary: "rgb(0, 122, 255)",
+      background: "rgb(242, 242, 247)",
+      card: "rgb(255, 255, 255)",
+      text: "rgb(0, 0, 0)",
+      border: "rgb(216, 216, 220)",
+      notification: "rgb(255, 59, 48)",
     },
   };
 
   const CustomDarkTheme: Theme = {
     ...DarkTheme,
     colors: {
-      primary: "rgb(10, 132, 255)", // System Blue (Dark Mode)
-      background: "rgb(1, 1, 1)", // True black background for OLED displays
-      card: "rgb(28, 28, 30)", // Dark card/surface color
-      text: "rgb(255, 255, 255)", // White text for dark mode
-      border: "rgb(44, 44, 46)", // Dark gray for separators/borders
-      notification: "rgb(255, 69, 58)", // System Red (Dark Mode)
+      primary: "rgb(10, 132, 255)",
+      background: "rgb(1, 1, 1)",
+      card: "rgb(28, 28, 30)",
+      text: "rgb(255, 255, 255)",
+      border: "rgb(44, 44, 46)",
+      notification: "rgb(255, 69, 58)",
     },
   };
+
   return (
     <>
       <StatusBar style="auto" animated />
-        <ThemeProvider
-          value={colorScheme === "dark" ? CustomDarkTheme : CustomDefaultTheme}
-        >
-          <AuthProvider>
-            <WidgetProvider>
-              <GestureHandlerRootView>
-              <Stack>
-                {/* Main app with tabs */}
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <ThemeProvider
+        value={colorScheme === "dark" ? CustomDarkTheme : CustomDefaultTheme}
+      >
+        <AuthProvider>
+          <WidgetProvider>
+            <GestureHandlerRootView>
+              <Stack screenOptions={{ headerShown: false }}>
+                {/* Waitlist Flow */}
+                <Stack.Screen name="waitlist/welcome" />
+                <Stack.Screen name="waitlist/sign-in" />
+                <Stack.Screen name="waitlist/application" />
+                <Stack.Screen name="waitlist/confirmation" />
 
-                {/* Auth screens */}
-                <Stack.Screen name="auth" options={{ headerShown: false }} />
+                {/* Auth Flow */}
+                <Stack.Screen name="auth/sign-up" />
+                <Stack.Screen name="auth/sign-in" />
+                <Stack.Screen name="auth/profile-setup" />
 
-                {/* Waitlist screens */}
-                <Stack.Screen name="waitlist" options={{ headerShown: false }} />
+                {/* Main App */}
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="chat/[id]" />
 
-                {/* Chat screen */}
-                <Stack.Screen name="chat/[id]" options={{ headerShown: false }} />
-
-                {/* OAuth callback screens */}
-                <Stack.Screen name="auth-callback" options={{ headerShown: false }} />
-                <Stack.Screen name="auth-popup" options={{ headerShown: false }} />
-
-                {/* Modal Demo Screens */}
+                {/* Modal Screens */}
                 <Stack.Screen
                   name="modal"
                   options={{
@@ -145,10 +153,10 @@ export default function RootLayout() {
                 />
               </Stack>
               <SystemBars style={"auto"} />
-              </GestureHandlerRootView>
-            </WidgetProvider>
-          </AuthProvider>
-        </ThemeProvider>
+            </GestureHandlerRootView>
+          </WidgetProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </>
   );
 }
