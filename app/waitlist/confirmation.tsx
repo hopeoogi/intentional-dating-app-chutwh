@@ -1,48 +1,45 @@
 
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import { IconSymbol } from '@/components/IconSymbol';
 
 export default function ConfirmationScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <LinearGradient
-        colors={['#1a1a1a', '#0a0a0a']}
-        style={styles.gradient}
-      >
-        <View style={styles.content}>
-          <View style={styles.iconContainer}>
-            <IconSymbol 
-              ios_icon_name="checkmark.circle.fill" 
-              android_material_icon_name="check-circle" 
-              size={80} 
-              color="#4CAF50" 
-            />
-          </View>
-
-          <Text style={styles.title}>You&apos;re on the list!</Text>
-          
-          <Text style={styles.message}>
-            Thank you for applying to join our exclusive community of intentional connections.
-          </Text>
-
-          <Text style={styles.submessage}>
-            We&apos;ll review your application and get back to you soon via email.
-          </Text>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => router.replace('/')}
-          >
-            <Text style={styles.buttonText}>Done</Text>
-          </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        <View style={styles.logoContainer}>
+          <IconSymbol 
+            ios_icon_name="checkmark.circle.fill" 
+            android_material_icon_name="check-circle" 
+            size={80} 
+            color="#4CAF50" 
+          />
+          <Text style={styles.brandName}>Intentional</Text>
         </View>
-      </LinearGradient>
+
+        <View style={styles.messageContainer}>
+          <Text style={styles.title}>Success!</Text>
+          <Text style={styles.message}>
+            Thank you for joining our waitlist! We review all applications and when you are approved we will contact you!
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => router.push('/waitlist/sign-in')}
+        >
+          <Text style={styles.buttonText}>Go back to Sign Up</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -50,52 +47,54 @@ export default function ConfirmationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  gradient: {
-    flex: 1,
+    backgroundColor: '#FFF',
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 24,
+    paddingHorizontal: 40,
+    paddingVertical: 60,
   },
-  iconContainer: {
-    marginBottom: 32,
+  logoContainer: {
+    alignItems: 'center',
+    marginTop: 40,
+  },
+  brandName: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#000',
+    marginTop: 16,
+    letterSpacing: 1,
+  },
+  messageContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 32,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 16,
-    textAlign: 'center',
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 20,
   },
   message: {
-    fontSize: 18,
-    color: '#ccc',
-    textAlign: 'center',
-    marginBottom: 12,
-    lineHeight: 26,
-  },
-  submessage: {
     fontSize: 16,
-    color: '#999',
+    color: '#666',
     textAlign: 'center',
-    marginBottom: 48,
     lineHeight: 24,
   },
   button: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: '#000',
     paddingVertical: 16,
-    paddingHorizontal: 48,
-    minWidth: 200,
+    paddingHorizontal: 40,
+    borderRadius: 30,
+    width: '100%',
     alignItems: 'center',
+    marginBottom: 40,
   },
   buttonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#000',
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '600',
   },
 });
