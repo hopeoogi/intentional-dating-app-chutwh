@@ -16,6 +16,8 @@ import {
 } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { WidgetProvider } from "@/contexts/WidgetContext";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { BACKEND_URL, healthCheck } from "@/utils/api";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -33,6 +35,16 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
+      
+      // Log backend URL and perform health check
+      console.log('[App] Backend URL configured:', BACKEND_URL);
+      healthCheck().then((healthy) => {
+        if (healthy) {
+          console.log('[App] ✅ Backend is healthy and reachable');
+        } else {
+          console.warn('[App] ⚠️ Backend health check failed');
+        }
+      });
     }
   }, [loaded]);
 
@@ -83,49 +95,51 @@ export default function RootLayout() {
       <ThemeProvider
         value={colorScheme === "dark" ? CustomDarkTheme : CustomDefaultTheme}
       >
-        <WidgetProvider>
-          <GestureHandlerRootView>
-            <Stack screenOptions={{ headerShown: false }}>
-              {/* Welcome video screen */}
-              <Stack.Screen name="welcome" />
-              
-              {/* Waitlist screens */}
-              <Stack.Screen name="waitlist/application" />
-              <Stack.Screen name="waitlist/pending" />
+        <AuthProvider>
+          <WidgetProvider>
+            <GestureHandlerRootView>
+              <Stack screenOptions={{ headerShown: false }}>
+                {/* Welcome video screen */}
+                <Stack.Screen name="welcome" />
+                
+                {/* Waitlist screens */}
+                <Stack.Screen name="waitlist/application" />
+                <Stack.Screen name="waitlist/pending" />
 
-              {/* Main app with tabs */}
-              <Stack.Screen name="(tabs)" />
+                {/* Main app with tabs */}
+                <Stack.Screen name="(tabs)" />
 
-              {/* Modal Demo Screens */}
-              <Stack.Screen
-                name="modal"
-                options={{
-                  presentation: "modal",
-                  title: "Standard Modal",
-                  headerShown: true,
-                }}
-              />
-              <Stack.Screen
-                name="formsheet"
-                options={{
-                  presentation: "formSheet",
-                  title: "Form Sheet Modal",
-                  headerShown: true,
-                  sheetGrabberVisible: true,
-                  sheetAllowedDetents: [0.5, 0.8, 1.0],
-                  sheetCornerRadius: 20,
-                }}
-              />
-              <Stack.Screen
-                name="transparent-modal"
-                options={{
-                  presentation: "transparentModal",
-                }}
-              />
-            </Stack>
-            <SystemBars style={"auto"} />
-          </GestureHandlerRootView>
-        </WidgetProvider>
+                {/* Modal Demo Screens */}
+                <Stack.Screen
+                  name="modal"
+                  options={{
+                    presentation: "modal",
+                    title: "Standard Modal",
+                    headerShown: true,
+                  }}
+                />
+                <Stack.Screen
+                  name="formsheet"
+                  options={{
+                    presentation: "formSheet",
+                    title: "Form Sheet Modal",
+                    headerShown: true,
+                    sheetGrabberVisible: true,
+                    sheetAllowedDetents: [0.5, 0.8, 1.0],
+                    sheetCornerRadius: 20,
+                  }}
+                />
+                <Stack.Screen
+                  name="transparent-modal"
+                  options={{
+                    presentation: "transparentModal",
+                  }}
+                />
+              </Stack>
+              <SystemBars style={"auto"} />
+            </GestureHandlerRootView>
+          </WidgetProvider>
+        </AuthProvider>
       </ThemeProvider>
     </>
   );
