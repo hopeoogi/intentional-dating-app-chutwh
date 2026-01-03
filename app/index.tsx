@@ -29,11 +29,6 @@ export default function WelcomeScreen() {
         style={styles.overlay}
       />
       <View style={styles.content}>
-        <Image
-          source={require('@/assets/images/fe27da58-f92e-44ef-87bb-ba6254bd415c.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
         <Text style={styles.title}>Intentional</Text>
       </View>
     </View>
@@ -60,15 +55,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  logo: {
-    width: 120,
-    height: 120,
-    marginBottom: 20,
-  },
   title: {
-    fontSize: 42,
+    fontSize: 48,
     fontWeight: '600',
     color: '#fff',
-    letterSpacing: 1,
+    letterSpacing: 2,
   },
 });
