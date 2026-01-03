@@ -16,10 +16,12 @@ import {
 } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { WidgetProvider } from "@/contexts/WidgetContext";
-import { AuthProvider } from "@/contexts/AuthContext";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+export const unstable_settings = {
+  initialRouteName: "index",
+};
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -74,66 +76,49 @@ export default function RootLayout() {
       notification: "rgb(255, 69, 58)",
     },
   };
-
+  
   return (
     <>
       <StatusBar style="auto" animated />
-      <ThemeProvider
-        value={colorScheme === "dark" ? CustomDarkTheme : CustomDefaultTheme}
-      >
-        <AuthProvider>
+        <ThemeProvider
+          value={colorScheme === "dark" ? CustomDarkTheme : CustomDefaultTheme}
+        >
           <WidgetProvider>
             <GestureHandlerRootView>
-              <Stack screenOptions={{ headerShown: false }}>
-                {/* Entry point - Welcome video */}
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                
-                {/* Waitlist Flow */}
-                <Stack.Screen name="waitlist/application" options={{ headerShown: false }} />
-                <Stack.Screen name="waitlist/confirmation" options={{ headerShown: false }} />
-
-                {/* Main app with tabs */}
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
-                {/* Auth screens */}
-                <Stack.Screen name="auth/sign-in" options={{ headerShown: false }} />
-                <Stack.Screen name="auth/sign-up" options={{ headerShown: false }} />
-                <Stack.Screen name="auth/profile-setup" options={{ headerShown: false }} />
-
-                {/* Chat */}
-                <Stack.Screen name="chat/[id]" options={{ headerShown: false }} />
-
-                {/* Modal Demo Screens */}
-                <Stack.Screen
-                  name="modal"
-                  options={{
-                    presentation: "modal",
-                    title: "Standard Modal",
-                  }}
-                />
-                <Stack.Screen
-                  name="formsheet"
-                  options={{
-                    presentation: "formSheet",
-                    title: "Form Sheet Modal",
-                    sheetGrabberVisible: true,
-                    sheetAllowedDetents: [0.5, 0.8, 1.0],
-                    sheetCornerRadius: 20,
-                  }}
-                />
-                <Stack.Screen
-                  name="transparent-modal"
-                  options={{
-                    presentation: "transparentModal",
-                    headerShown: false,
-                  }}
-                />
-              </Stack>
-              <SystemBars style={"auto"} />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="waitlist/application" />
+              <Stack.Screen name="waitlist/confirmation" />
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen
+                name="modal"
+                options={{
+                  presentation: "modal",
+                  title: "Standard Modal",
+                }}
+              />
+              <Stack.Screen
+                name="formsheet"
+                options={{
+                  presentation: "formSheet",
+                  title: "Form Sheet Modal",
+                  sheetGrabberVisible: true,
+                  sheetAllowedDetents: [0.5, 0.8, 1.0],
+                  sheetCornerRadius: 20,
+                }}
+              />
+              <Stack.Screen
+                name="transparent-modal"
+                options={{
+                  presentation: "transparentModal",
+                  headerShown: false,
+                }}
+              />
+            </Stack>
+            <SystemBars style={"auto"} />
             </GestureHandlerRootView>
           </WidgetProvider>
-        </AuthProvider>
-      </ThemeProvider>
+        </ThemeProvider>
     </>
   );
 }
