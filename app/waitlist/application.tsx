@@ -40,6 +40,8 @@ export default function ApplicationScreen() {
   const [additionalInfo, setAdditionalInfo] = useState('');
   const [loading, setLoading] = useState(false);
 
+  console.log('[ApplicationScreen] Rendered');
+
   const toggleLookingFor = (option: string) => {
     if (lookingFor.includes(option)) {
       setLookingFor(lookingFor.filter((item) => item !== option));
@@ -49,6 +51,8 @@ export default function ApplicationScreen() {
   };
 
   const handleSubmit = async () => {
+    console.log('[ApplicationScreen] Submit button pressed');
+
     // Validation
     if (!firstName.trim() || !lastName.trim()) {
       Alert.alert('Error', 'Please enter your first and last name');
@@ -78,10 +82,11 @@ export default function ApplicationScreen() {
 
     if (!isBackendConfigured()) {
       Alert.alert('Error', 'Backend not configured. Please contact support.');
-      console.error('[Application] Backend URL:', BACKEND_URL);
+      console.error('[ApplicationScreen] Backend URL:', BACKEND_URL);
       return;
     }
 
+    console.log('[ApplicationScreen] Validation passed, submitting...');
     setLoading(true);
 
     try {
@@ -98,19 +103,21 @@ export default function ApplicationScreen() {
         additionalInfo: additionalInfo.trim() || undefined,
       };
 
-      console.log('[Application] Submitting:', applicationData);
+      console.log('[ApplicationScreen] Submitting application data:', applicationData);
 
       const response = await apiPost('/api/waitlist/apply', applicationData);
 
-      console.log('[Application] Response:', response);
+      console.log('[ApplicationScreen] API Response:', response);
 
       if (response.success || response.id) {
+        console.log('[ApplicationScreen] Application successful, navigating to confirmation...');
         router.replace('/waitlist/confirmation');
       } else {
+        console.error('[ApplicationScreen] Application failed:', response);
         Alert.alert('Error', response.message || 'Failed to submit application');
       }
     } catch (error: any) {
-      console.error('[Application] Submit error:', error);
+      console.error('[ApplicationScreen] Submit error:', error);
       Alert.alert(
         'Submission Failed',
         error.message || 'Unable to submit application. Please try again.'
