@@ -15,6 +15,7 @@ import { user } from './auth-schema.js';
 export const approvalStatusEnum = pgEnum('approval_status', ['pending', 'approved', 'rejected']);
 export const conversationStatusEnum = pgEnum('conversation_status', ['active', 'ended', 'snoozed']);
 export const conversationActionTypeEnum = pgEnum('conversation_action_type', ['reply', 'end', 'snooze']);
+export const waitlistStatusEnum = pgEnum('waitlist_status', ['pending', 'approved', 'rejected']);
 
 // Extended user profile table
 export const userProfile = pgTable('user_profile', {
@@ -111,6 +112,28 @@ export const conversationActions = pgTable('conversation_actions', {
   index('idx_conversation_actions_conv').on(table.conversationId),
   index('idx_conversation_actions_user').on(table.userId),
   index('idx_conversation_actions_type').on(table.actionType),
+]);
+
+// Waitlist applications table
+export const waitlistApplications = pgTable('waitlist_applications', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  age: integer('age').notNull(),
+  location: text('location').notNull(),
+  email: text('email').notNull().unique(),
+  phone: text('phone'),
+  lookingFor: text('looking_for').notNull(),
+  additionalInfo: text('additional_info'),
+  status: waitlistStatusEnum('status').default('pending').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+}, (table) => [
+  index('idx_waitlist_email').on(table.email),
+  index('idx_waitlist_status').on(table.status),
+  index('idx_waitlist_created').on(table.createdAt),
 ]);
 
 // Relations

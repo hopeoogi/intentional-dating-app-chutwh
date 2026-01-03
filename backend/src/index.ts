@@ -7,6 +7,7 @@ import { registerProfileRoutes } from './routes/profile.js';
 import { registerMatchesRoutes } from './routes/matches.js';
 import { registerConversationsRoutes } from './routes/conversations.js';
 import { registerAdminRoutes } from './routes/admin.js';
+import { registerWaitlistRoutes } from './routes/waitlist.js';
 
 // Combine both schemas (app schema + auth schema)
 const schema = { ...appSchema, ...authSchema };
@@ -28,6 +29,7 @@ registerProfileRoutes(app, app.fastify);
 registerMatchesRoutes(app, app.fastify);
 registerConversationsRoutes(app, app.fastify);
 registerAdminRoutes(app, app.fastify);
+registerWaitlistRoutes(app, app.fastify);
 
 // Health check endpoint
 app.fastify.get('/api/health', async () => {
