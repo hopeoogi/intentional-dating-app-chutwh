@@ -8,6 +8,7 @@ import { registerMatchesRoutes } from './routes/matches.js';
 import { registerConversationsRoutes } from './routes/conversations.js';
 import { registerAdminRoutes } from './routes/admin.js';
 import { registerWaitlistRoutes } from './routes/waitlist.js';
+import { registerVideoRoutes } from './routes/video.js';
 
 // Combine both schemas (app schema + auth schema)
 const schema = { ...appSchema, ...authSchema };
@@ -30,6 +31,7 @@ registerMatchesRoutes(app, app.fastify);
 registerConversationsRoutes(app, app.fastify);
 registerAdminRoutes(app, app.fastify);
 registerWaitlistRoutes(app, app.fastify);
+registerVideoRoutes(app, app.fastify);
 
 // Health check endpoint
 app.fastify.get('/api/health', async () => {
