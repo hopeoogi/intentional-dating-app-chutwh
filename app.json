@@ -1,8 +1,7 @@
-
 {
   "expo": {
-    "name": "Natively",
-    "slug": "Natively",
+    "name": "Intentional Dating",
+    "slug": "Intentional Dating",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/natively-dark.png",
@@ -15,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.Natively",
+      "bundleIdentifier": "com.intentional.dating",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -26,10 +25,10 @@
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.Natively"
+      "package": "com.intentional.dating"
     },
     "web": {
-      "favicon": "./assets/images/final_quest_240x240.png",
+      "favicon": "./assets/images/natively-dark.png",
       "bundler": "metro"
     },
     "plugins": [
@@ -37,7 +36,7 @@
       "expo-router",
       "expo-web-browser"
     ],
-    "scheme": "natively",
+    "scheme": "intentional",
     "experiments": {
       "typedRoutes": true
     },
@@ -45,5 +44,6 @@
       "router": {},
       "backendUrl": "https://erm5magsz6azuge4mtdkxhsmzj7uqr45.app.specular.dev"
     }
-  }
+  },
+  "scheme": "Intentional Dating"
 }
