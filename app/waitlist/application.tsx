@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -13,10 +13,10 @@ import {
   ActivityIndicator,
   Image,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { apiPost, BACKEND_URL, isBackendConfigured, healthCheck } from '@/utils/api';
+import { apiPost } from '@/utils/api';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const RELATIONSHIP_GOALS = [
   'Long-term relationship',
@@ -29,17 +29,17 @@ const RELATIONSHIP_GOALS = [
   'Building a family',
   'Finding my person',
   'Committed relationship',
-  'Exclusive dating',
+  'Monogamous relationship',
   'Partnership',
   'Soulmate',
   'Meaningful connection',
+  'Exclusive dating',
+  'Future-focused dating',
   'Intentional dating',
-  'Authentic relationship',
-  'Lasting love',
-  'Growth together',
-  'Shared values',
+  'Authentic connection',
   'Long-term commitment',
   'Building something real',
+  'Finding love',
 ];
 
 const MAX_SELECTIONS = 5;
@@ -48,548 +48,340 @@ export default function ApplicationScreen() {
   const router = useRouter();
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
-  const [location, setLocation] = useState('');
+  const [city, setCity] = useState('');
+  const [provinceState, setProvinceState] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [lookingFor, setLookingFor] = useState<string[]>([]);
   const [additionalInfo, setAdditionalInfo] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [backendHealthy, setBackendHealthy] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    // Check backend health on mount
-    checkBackendHealth();
-  }, []);
-
-  const checkBackendHealth = async () => {
-    console.log('[Application] Checking backend health...');
-    const healthy = await healthCheck();
-    setBackendHealthy(healthy);
-    
-    if (!healthy) {
-      console.error('[Application] ❌ Backend is not healthy');
-      Alert.alert(
-        'Connection Issue',
-        'Unable to connect to the server. Please check your internet connection and try again.',
-        [
-          { text: 'Retry', onPress: checkBackendHealth },
-          { text: 'Continue Anyway', style: 'cancel' }
-        ]
-      );
-    } else {
-      console.log('[Application] ✅ Backend is healthy');
-    }
-  };
+  const [submitting, setSubmitting] = useState(false);
 
   const toggleLookingFor = (option: string) => {
     if (lookingFor.includes(option)) {
-      // Allow deselecting
       setLookingFor(lookingFor.filter((item) => item !== option));
-    } else if (lookingFor.length < MAX_SELECTIONS) {
-      // Only allow selecting if under the limit
-      setLookingFor([...lookingFor, option]);
     } else {
-      // Show alert when trying to select more than 5
-      Alert.alert(
-        'Maximum Selections Reached',
-        `You can select up to ${MAX_SELECTIONS} relationship goals. Please deselect one to choose another.`
-      );
+      if (lookingFor.length < MAX_SELECTIONS) {
+        setLookingFor([...lookingFor, option]);
+      } else {
+        Alert.alert('Maximum Selections', `You can select up to ${MAX_SELECTIONS} options.`);
+      }
     }
   };
 
   const handleSubmit = async () => {
-    console.log('[Application] ========================================');
-    console.log('[Application] Starting submission process...');
-    console.log('[Application] ========================================');
+    console.log('[Application] Starting submission...');
     
     // Validation
     if (!name.trim()) {
-      console.log('[Application] Validation failed: name is empty');
-      Alert.alert('Error', 'Please enter your name');
+      Alert.alert('Required Field', 'Please enter your name.');
       return;
     }
-    if (!age.trim() || isNaN(Number(age)) || Number(age) < 18) {
-      console.log('[Application] Validation failed: invalid age');
-      Alert.alert('Error', 'Please enter a valid age (18+)');
+
+    const ageNum = parseInt(age);
+    if (!age || isNaN(ageNum) || ageNum < 18 || ageNum > 100) {
+      Alert.alert('Invalid Age', 'Please enter a valid age (18-100).');
       return;
     }
-    if (!location.trim()) {
-      console.log('[Application] Validation failed: location is empty');
-      Alert.alert('Error', 'Please enter your location');
+
+    if (!city.trim() || !provinceState.trim()) {
+      Alert.alert('Required Field', 'Please enter your city and province/state.');
       return;
     }
+
     if (!email.trim() || !email.includes('@')) {
-      console.log('[Application] Validation failed: invalid email');
-      Alert.alert('Error', 'Please enter a valid email');
+      Alert.alert('Invalid Email', 'Please enter a valid email address.');
       return;
     }
+
     if (lookingFor.length === 0) {
-      console.log('[Application] Validation failed: no relationship goals selected');
-      Alert.alert('Error', 'Please select at least one relationship goal');
+      Alert.alert('Required Field', 'Please select at least one relationship goal.');
       return;
     }
 
-    console.log('[Application] ✅ All validations passed');
-
-    // Check backend configuration
-    if (!isBackendConfigured()) {
-      console.error('[Application] ❌ Backend not configured');
-      Alert.alert(
-        'Configuration Error',
-        'Backend is not configured. Please contact support.\n\nBackend URL: ' + (BACKEND_URL || 'NOT SET')
-      );
-      return;
-    }
-
-    console.log('[Application] ✅ Backend is configured');
-    console.log('[Application] Backend URL:', BACKEND_URL);
-
-    const payload = {
-      name: name.trim(),
-      age: Number(age),
-      location: location.trim(),
-      email: email.trim().toLowerCase(),
-      phone: phone.trim() || undefined,
-      lookingFor,
-      additionalInfo: additionalInfo.trim() || undefined,
-    };
-
-    console.log('[Application] Payload prepared:', JSON.stringify(payload, null, 2));
-
-    setLoading(true);
+    setSubmitting(true);
 
     try {
-      console.log('[Application] Calling API endpoint: /api/waitlist/apply');
+      const location = `${city.trim()}, ${provinceState.trim()}`;
       
-      const response = await apiPost('/api/waitlist/apply', payload);
+      const applicationData = {
+        name: name.trim(),
+        age: ageNum,
+        location,
+        email: email.trim(),
+        phone: phone.trim() || undefined,
+        lookingFor,
+        additionalInfo: additionalInfo.trim() || undefined,
+      };
 
-      console.log('[Application] ✅✅✅ Application submitted successfully!');
-      console.log('[Application] Response:', response);
-      
-      // Navigate to confirmation
-      console.log('[Application] Navigating to confirmation screen...');
-      router.push('/waitlist/confirmation');
-    } catch (error: any) {
-      console.error('[Application] ❌❌❌ Submission error occurred');
-      console.error('[Application] Error type:', error.constructor.name);
-      console.error('[Application] Error message:', error.message);
-      console.error('[Application] Error stack:', error.stack);
-      
-      let errorMessage = 'Failed to submit application. Please try again.';
-      let errorDetails = '';
-      
-      if (error.message?.includes('duplicate') || error.message?.includes('already exists')) {
-        errorMessage = 'This email is already registered. Please use a different email.';
-      } else if (error.message?.includes('Network') || error.message?.includes('network')) {
-        errorMessage = 'Network error. Please check your internet connection and try again.';
-        errorDetails = '\n\nTip: Make sure you have a stable internet connection.';
-      } else if (error.message?.includes('Backend URL not configured')) {
-        errorMessage = 'App is not properly configured. Please contact support.';
-        errorDetails = '\n\nBackend URL: ' + (BACKEND_URL || 'NOT SET');
-      } else if (error.message?.includes('timeout')) {
-        errorMessage = 'Request timed out. Please try again.';
-        errorDetails = '\n\nThe server took too long to respond.';
-      } else if (error.message?.includes('API error')) {
-        errorMessage = error.message;
-        errorDetails = '\n\nPlease check your information and try again.';
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      console.error('[Application] Showing error to user:', errorMessage + errorDetails);
-      
+      console.log('[Application] Submitting data:', applicationData);
+
+      // TODO: Backend Integration - Submit application to /api/waitlist/apply endpoint
+      const response = await apiPost('/api/waitlist/apply', applicationData);
+
+      console.log('[Application] Submission successful:', response);
+
       Alert.alert(
-        'Submission Error', 
-        errorMessage + errorDetails,
+        'Application Submitted!',
+        'Thank you for applying. We will review your application and get back to you soon.',
         [
-          { text: 'Test Connection', onPress: checkBackendHealth },
-          { text: 'Try Again', style: 'cancel' }
+          {
+            text: 'OK',
+            onPress: () => router.push('/waitlist/confirmation'),
+          },
         ]
       );
+    } catch (error: any) {
+      console.error('[Application] Submission error:', error);
+      Alert.alert(
+        'Submission Failed',
+        error.message || 'Unable to submit your application. Please check your connection and try again.'
+      );
     } finally {
-      setLoading(false);
-      console.log('[Application] ========================================');
+      setSubmitting(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <LinearGradient colors={['#1a1a1a', '#000000']} style={styles.gradient}>
+    <LinearGradient colors={['#1a1a1a', '#2d2d2d', '#1a1a1a']} style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.keyboardView}
         >
           <ScrollView
-            style={styles.scrollView}
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
           >
-            <View style={styles.header}>
-              <Image
-                source={require('@/assets/images/natively-dark.png')}
-                style={styles.logo}
-                resizeMode="contain"
-              />
-              <Text style={styles.title}>Join Intentional</Text>
-              <Text style={styles.subtitle}>
-                Tell us about yourself to join our community
-              </Text>
-              
-              {backendHealthy === false && (
-                <View style={styles.warningBanner}>
-                  <Text style={styles.warningText}>⚠️ Connection issue detected</Text>
-                  <TouchableOpacity onPress={checkBackendHealth}>
-                    <Text style={styles.retryText}>Tap to retry</Text>
+            {/* Logo - Your Intentional logo */}
+            <Image
+              source={require('@/assets/images/a5c86ed3-6460-4f6d-a333-47f2974b9f7d.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+
+            <Text style={styles.title}>Join Intentional</Text>
+            <Text style={styles.subtitle}>Tell us about yourself</Text>
+
+            {/* Name */}
+            <Text style={styles.label}>Name *</Text>
+            <TextInput
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+              placeholder="Your full name"
+              placeholderTextColor="#666"
+            />
+
+            {/* Age */}
+            <Text style={styles.label}>Age *</Text>
+            <TextInput
+              style={styles.input}
+              value={age}
+              onChangeText={setAge}
+              placeholder="Your age"
+              placeholderTextColor="#666"
+              keyboardType="number-pad"
+            />
+
+            {/* Location - City, Province/State */}
+            <Text style={styles.label}>Location *</Text>
+            <TextInput
+              style={styles.input}
+              value={city}
+              onChangeText={setCity}
+              placeholder="City"
+              placeholderTextColor="#666"
+            />
+            <TextInput
+              style={[styles.input, styles.inputSpacing]}
+              value={provinceState}
+              onChangeText={setProvinceState}
+              placeholder="Province/State"
+              placeholderTextColor="#666"
+            />
+
+            {/* Email */}
+            <Text style={styles.label}>Email *</Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="your@email.com"
+              placeholderTextColor="#666"
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+
+            {/* Phone */}
+            <Text style={styles.label}>Phone (Optional)</Text>
+            <TextInput
+              style={styles.input}
+              value={phone}
+              onChangeText={setPhone}
+              placeholder="Your phone number"
+              placeholderTextColor="#666"
+              keyboardType="phone-pad"
+            />
+
+            {/* What are you looking for? - 21 options, up to 5 selections */}
+            <Text style={styles.label}>
+              What are you looking for? * (Select up to {MAX_SELECTIONS})
+            </Text>
+            <Text style={styles.selectionCount}>
+              {lookingFor.length} / {MAX_SELECTIONS} selected
+            </Text>
+            <View style={styles.optionsContainer}>
+              {RELATIONSHIP_GOALS.map((option) => {
+                const isSelected = lookingFor.includes(option);
+                return (
+                  <TouchableOpacity
+                    key={option}
+                    style={[styles.optionButton, isSelected && styles.optionButtonSelected]}
+                    onPress={() => toggleLookingFor(option)}
+                  >
+                    <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+                      {option}
+                    </Text>
                   </TouchableOpacity>
-                </View>
-              )}
-              
-              {backendHealthy === true && (
-                <View style={styles.successBanner}>
-                  <Text style={styles.successText}>✅ Connected to server</Text>
-                </View>
-              )}
+                );
+              })}
             </View>
 
-            <View style={styles.form}>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Full Name *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={name}
-                  onChangeText={setName}
-                  placeholder="Enter your name"
-                  placeholderTextColor="#666"
-                  autoCapitalize="words"
-                />
-              </View>
+            {/* Additional Info */}
+            <Text style={styles.label}>Tell us more (Optional)</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={additionalInfo}
+              onChangeText={setAdditionalInfo}
+              placeholder="Anything else you'd like us to know..."
+              placeholderTextColor="#666"
+              multiline
+              numberOfLines={4}
+              textAlignVertical="top"
+            />
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Age *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={age}
-                  onChangeText={setAge}
-                  placeholder="18+"
-                  placeholderTextColor="#666"
-                  keyboardType="number-pad"
-                  maxLength={2}
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Location *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={location}
-                  onChangeText={setLocation}
-                  placeholder="City, State"
-                  placeholderTextColor="#666"
-                  autoCapitalize="words"
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Email *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="your@email.com"
-                  placeholderTextColor="#666"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Phone (Optional)</Text>
-                <TextInput
-                  style={styles.input}
-                  value={phone}
-                  onChangeText={setPhone}
-                  placeholder="+1 (555) 123-4567"
-                  placeholderTextColor="#666"
-                  keyboardType="phone-pad"
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <View style={styles.labelRow}>
-                  <Text style={styles.label}>What are you looking for? *</Text>
-                  <Text style={styles.counter}>
-                    {lookingFor.length}/{MAX_SELECTIONS} selected
-                  </Text>
-                </View>
-                <Text style={styles.helperText}>
-                  Select up to {MAX_SELECTIONS} that resonate with you
-                </Text>
-                <View style={styles.optionsGrid}>
-                  {RELATIONSHIP_GOALS.map((option) => {
-                    const isSelected = lookingFor.includes(option);
-                    const isDisabled = !isSelected && lookingFor.length >= MAX_SELECTIONS;
-                    
-                    return (
-                      <TouchableOpacity
-                        key={option}
-                        style={[
-                          styles.optionChip,
-                          isSelected && styles.optionChipSelected,
-                          isDisabled && styles.optionChipDisabled,
-                        ]}
-                        onPress={() => toggleLookingFor(option)}
-                        disabled={isDisabled}
-                      >
-                        <Text
-                          style={[
-                            styles.optionText,
-                            isSelected && styles.optionTextSelected,
-                            isDisabled && styles.optionTextDisabled,
-                          ]}
-                        >
-                          {option}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Tell us more (Optional)</Text>
-                <TextInput
-                  style={[styles.input, styles.textArea]}
-                  value={additionalInfo}
-                  onChangeText={setAdditionalInfo}
-                  placeholder="Share anything else you&apos;d like us to know..."
-                  placeholderTextColor="#666"
-                  multiline
-                  numberOfLines={4}
-                  textAlignVertical="top"
-                />
-              </View>
-
-              <TouchableOpacity
-                style={[styles.submitButton, loading && styles.submitButtonDisabled]}
-                onPress={handleSubmit}
-                disabled={loading}
-              >
-                {loading ? (
-                  <ActivityIndicator color="#000" />
-                ) : (
-                  <Text style={styles.submitButtonText}>Submit Application</Text>
-                )}
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.testButton}
-                onPress={checkBackendHealth}
-              >
-                <Text style={styles.testButtonText}>🔍 Test Server Connection</Text>
-              </TouchableOpacity>
-
-              <Text style={styles.disclaimer}>
-                By submitting, you agree to our community guidelines and privacy policy.
-              </Text>
-            </View>
+            {/* Submit Button */}
+            <TouchableOpacity
+              style={[styles.submitButton, submitting && styles.submitButtonDisabled]}
+              onPress={handleSubmit}
+              disabled={submitting}
+            >
+              {submitting ? (
+                <ActivityIndicator color="#1a1a1a" />
+              ) : (
+                <Text style={styles.submitButtonText}>Submit Application</Text>
+              )}
+            </TouchableOpacity>
           </ScrollView>
         </KeyboardAvoidingView>
-      </LinearGradient>
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
   },
-  gradient: {
+  safeArea: {
     flex: 1,
   },
   keyboardView: {
     flex: 1,
   },
-  scrollView: {
-    flex: 1,
-  },
   scrollContent: {
-    paddingHorizontal: 24,
+    padding: 24,
     paddingBottom: 40,
-  },
-  header: {
-    alignItems: 'center',
-    paddingTop: 20,
-    paddingBottom: 30,
   },
   logo: {
     width: 80,
     height: 80,
+    alignSelf: 'center',
     marginBottom: 20,
   },
   title: {
     fontSize: 32,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: '300',
+    color: '#ffffff',
+    textAlign: 'center',
     marginBottom: 8,
+    letterSpacing: 0.5,
   },
   subtitle: {
     fontSize: 16,
-    color: '#999',
+    color: '#999999',
     textAlign: 'center',
-  },
-  warningBanner: {
-    marginTop: 16,
-    backgroundColor: '#ff9800',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  warningText: {
-    color: '#000',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  retryText: {
-    color: '#000',
-    fontWeight: '700',
-    fontSize: 12,
-    marginTop: 4,
-    textDecorationLine: 'underline',
-  },
-  successBanner: {
-    marginTop: 16,
-    backgroundColor: '#4caf50',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  successText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 12,
-  },
-  form: {
-    width: '100%',
-  },
-  inputGroup: {
-    marginBottom: 24,
+    marginBottom: 32,
   },
   label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-    marginBottom: 8,
-  },
-  labelRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  counter: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
-    backgroundColor: '#333',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  helperText: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
+    color: '#ffffff',
+    marginBottom: 8,
+    marginTop: 16,
+    fontWeight: '500',
   },
   input: {
-    backgroundColor: '#1a1a1a',
-    borderWidth: 1,
-    borderColor: '#333',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    padding: 16,
     fontSize: 16,
-    color: '#fff',
+    color: '#ffffff',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  inputSpacing: {
+    marginTop: 12,
   },
   textArea: {
     height: 100,
-    paddingTop: 14,
+    paddingTop: 16,
   },
-  optionsGrid: {
+  selectionCount: {
+    fontSize: 12,
+    color: '#999999',
+    marginBottom: 12,
+  },
+  optionsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    marginTop: 8,
   },
-  optionChip: {
-    backgroundColor: '#1a1a1a',
-    borderWidth: 1,
-    borderColor: '#333',
+  optionButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 20,
-    paddingHorizontal: 16,
     paddingVertical: 10,
+    paddingHorizontal: 16,
+    margin: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
-  optionChipSelected: {
-    backgroundColor: '#fff',
-    borderColor: '#fff',
-  },
-  optionChipDisabled: {
-    backgroundColor: '#0d0d0d',
-    borderColor: '#222',
-    opacity: 0.5,
+  optionButtonSelected: {
+    backgroundColor: '#ffffff',
+    borderColor: '#ffffff',
   },
   optionText: {
+    color: '#ffffff',
     fontSize: 14,
-    color: '#999',
-    fontWeight: '500',
   },
   optionTextSelected: {
-    color: '#000',
+    color: '#1a1a1a',
     fontWeight: '600',
   },
-  optionTextDisabled: {
-    color: '#555',
-  },
   submitButton: {
-    backgroundColor: '#fff',
-    paddingVertical: 16,
+    backgroundColor: '#ffffff',
     borderRadius: 30,
+    paddingVertical: 16,
     alignItems: 'center',
-    marginTop: 10,
-    shadowColor: '#fff',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    marginTop: 32,
   },
   submitButtonDisabled: {
     opacity: 0.6,
   },
   submitButtonText: {
-    color: '#000',
-    fontSize: 17,
+    color: '#1a1a1a',
+    fontSize: 16,
     fontWeight: '600',
-  },
-  testButton: {
-    backgroundColor: '#333',
-    paddingVertical: 12,
-    borderRadius: 20,
-    alignItems: 'center',
-    marginTop: 12,
-    borderWidth: 1,
-    borderColor: '#555',
-  },
-  testButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  disclaimer: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
-    marginTop: 16,
-    lineHeight: 18,
+    letterSpacing: 0.5,
   },
 });

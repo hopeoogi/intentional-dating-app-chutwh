@@ -9,62 +9,60 @@ import {
   Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export default function SignInScreen() {
   const router = useRouter();
 
-  const handleJoinWaitlist = () => {
-    console.log('[Sign-In] Join Waitlist button pressed');
-    console.log('[Sign-In] Navigating to /waitlist/application');
-    router.push('/waitlist/application');
-  };
-
   return (
-    <SafeAreaView style={styles.container}>
-      <LinearGradient
-        colors={['#1a1a1a', '#000000']}
-        style={styles.gradient}
-      >
+    <LinearGradient
+      colors={['#1a1a1a', '#2d2d2d', '#1a1a1a']}
+      style={styles.container}
+    >
+      <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
+          {/* Logo - Your Intentional logo */}
           <Image
-            source={require('@/assets/images/natively-dark.png')}
+            source={require('@/assets/images/a5c86ed3-6460-4f6d-a333-47f2974b9f7d.png')}
             style={styles.logo}
             resizeMode="contain"
           />
-          
+
+          {/* Title */}
           <Text style={styles.title}>Intentional</Text>
           <Text style={styles.subtitle}>Dating with purpose</Text>
 
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={handleJoinWaitlist}
-            >
-              <Text style={styles.buttonText}>Join the Waitlist</Text>
-            </TouchableOpacity>
-          </View>
+          {/* Apply Button */}
+          <TouchableOpacity
+            style={styles.applyButton}
+            onPress={() => router.push('/waitlist/application')}
+          >
+            <Text style={styles.applyButtonText}>Apply to Join</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.footerText}>
+            By continuing, you agree to our Terms of Service and Privacy Policy
+          </Text>
         </View>
-      </LinearGradient>
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
   },
-  gradient: {
+  safeArea: {
     flex: 1,
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 40,
   },
   logo: {
@@ -74,35 +72,34 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 42,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 10,
-    letterSpacing: 0.5,
+    fontWeight: '300',
+    color: '#ffffff',
+    marginBottom: 8,
+    letterSpacing: 1,
   },
   subtitle: {
-    fontSize: 18,
-    color: '#999',
+    fontSize: 16,
+    color: '#999999',
     marginBottom: 60,
-    fontWeight: '400',
+    letterSpacing: 0.5,
   },
-  buttonContainer: {
-    width: '100%',
-    maxWidth: 320,
-  },
-  button: {
-    backgroundColor: '#fff',
+  applyButton: {
+    backgroundColor: '#ffffff',
     paddingVertical: 16,
+    paddingHorizontal: 60,
     borderRadius: 30,
-    alignItems: 'center',
-    shadowColor: '#fff',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    marginBottom: 40,
   },
-  buttonText: {
-    color: '#000',
-    fontSize: 17,
+  applyButtonText: {
+    color: '#1a1a1a',
+    fontSize: 16,
     fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  footerText: {
+    fontSize: 12,
+    color: '#666666',
+    textAlign: 'center',
+    paddingHorizontal: 20,
   },
 });
