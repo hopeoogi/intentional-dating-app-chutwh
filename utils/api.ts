@@ -1,4 +1,3 @@
-
 /**
  * API Utilities Template
  *
@@ -32,31 +31,15 @@ export const BACKEND_URL = Constants.expoConfig?.extra?.backendUrl || "";
 
 /**
  * Bearer token storage key
- * TODO: Replace "your-app" with actual app name to match auth-client.ts
+ * Must match the key used in lib/auth.ts
  */
-const BEARER_TOKEN_KEY = "your-app_bearer_token";
+const BEARER_TOKEN_KEY = "intentional_dating_bearer_token";
 
 /**
  * Check if backend is properly configured
  */
 export const isBackendConfigured = (): boolean => {
   return !!BACKEND_URL && BACKEND_URL.length > 0;
-};
-
-/**
- * Health check endpoint
- */
-export const healthCheck = async (): Promise<boolean> => {
-  try {
-    if (!isBackendConfigured()) {
-      return false;
-    }
-    const response = await fetch(`${BACKEND_URL}/api/health`);
-    return response.ok;
-  } catch (error) {
-    console.error("[API] Health check failed:", error);
-    return false;
-  }
 };
 
 /**
@@ -84,12 +67,14 @@ export const getBearerToken = async (): Promise<string | null> => {
  *
  * @param endpoint - API endpoint path (e.g., '/users', '/auth/login')
  * @param options - Fetch options (method, headers, body, etc.)
+ * @param retries - Number of retry attempts (default: 0)
  * @returns Parsed JSON response
  * @throws Error if backend is not configured or request fails
  */
 export const apiCall = async <T = any>(
   endpoint: string,
-  options?: RequestInit
+  options?: RequestInit,
+  retries: number = 0
 ): Promise<T> => {
   if (!isBackendConfigured()) {
     throw new Error("Backend URL not configured. Please rebuild the app.");
@@ -110,23 +95,29 @@ export const apiCall = async <T = any>(
     if (!response.ok) {
       const text = await response.text();
       console.error("[API] Error response:", response.status, text);
-      
-      // Try to parse error message from response
-      let errorMessage = `API error: ${response.status}`;
-      try {
-        const errorData = JSON.parse(text);
-        errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch {
-        errorMessage = text || errorMessage;
-      }
-      
-      throw new Error(errorMessage);
+      throw new Error(`API error: ${response.status} - ${text}`);
     }
 
     const data = await response.json();
     console.log("[API] Success:", data);
     return data;
   } catch (error: any) {
+    // Retry on network errors if retries are available
+    if (retries > 0 && (error.message?.includes('Network') || error.message?.includes('fetch'))) {
+      console.log(`[API] Retrying... (${retries} attempts left)`);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+      return apiCall<T>(endpoint, options, retries - 1);
+    }
+    
+    // Enhance error message for common issues
+    if (error.message?.includes('Network request failed')) {
+      console.error("[API] Network error - check your internet connection");
+      throw new Error('Network error - please check your internet connection');
+    } else if (error.message?.includes('Failed to fetch')) {
+      console.error("[API] Failed to reach backend - backend may be down");
+      throw new Error('Unable to reach server - please try again later');
+    }
+    
     console.error("[API] Request failed:", error);
     throw error;
   }
@@ -264,4 +255,46 @@ export const authenticatedPatch = async <T = any>(
  */
 export const authenticatedDelete = async <T = any>(endpoint: string): Promise<T> => {
   return authenticatedApiCall<T>(endpoint, { method: "DELETE" });
+};
+
+/**
+ * Check if user profile is complete
+ * Returns true if profile exists and has required fields
+ */
+export const checkProfileComplete = async (): Promise<boolean> => {
+  try {
+    const profile = await authenticatedGet<any>('/api/profile/me');
+    // Check if profile has required fields (age, location, photos)
+    return !!(profile && profile.age && profile.location && profile.photos?.length > 0);
+  } catch (error) {
+    console.error('[API] Failed to check profile:', error);
+    return false;
+  }
+};
+
+/**
+ * Health check - verify backend is reachable
+ * @returns true if backend is healthy, false otherwise
+ */
+export const healthCheck = async (): Promise<boolean> => {
+  try {
+    if (!isBackendConfigured()) {
+      console.error('[API] Backend URL not configured');
+      return false;
+    }
+
+    const response = await fetch(`${BACKEND_URL}/api/health`);
+    const isHealthy = response.ok;
+    
+    if (isHealthy) {
+      console.log('[API] Backend health check passed ✓');
+    } else {
+      console.error('[API] Backend health check failed:', response.status);
+    }
+    
+    return isHealthy;
+  } catch (error) {
+    console.error('[API] Backend health check error:', error);
+    return false;
+  }
 };
