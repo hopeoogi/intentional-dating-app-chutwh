@@ -1,14 +1,15 @@
+
 {
   "expo": {
-    "name": "Intentional Dating",
-    "slug": "Intentional Dating",
+    "name": "Intentional",
+    "slug": "Intentional",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/ab20ad44-8729-4a6f-86c6-a7356bbf7036.png",
+    "icon": "./assets/images/natively-dark.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/ab20ad44-8729-4a6f-86c6-a7356bbf7036.png",
+      "image": "./assets/images/natively-dark.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
@@ -21,14 +22,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/ab20ad44-8729-4a6f-86c6-a7356bbf7036.png",
+        "foregroundImage": "./assets/images/natively-dark.png",
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.intentional.dating"
     },
     "web": {
-      "favicon": "./assets/images/ab20ad44-8729-4a6f-86c6-a7356bbf7036.png",
+      "favicon": "./assets/images/natively-dark.png",
       "bundler": "metro"
     },
     "plugins": [
@@ -42,8 +43,7 @@
     },
     "extra": {
       "router": {},
-      "backendUrl": "https://erm5magsz6azuge4mtdkxhsmzj7uqr45.app.specular.dev"
+      "backendUrl": "https://erm5magsz6azuge4mtdkxhsmzj7uquge4mtdkxhsmzj7uqr45.app.specular.dev"
     }
-  },
-  "scheme": "Intentional Dating"
+  }
 }
