@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useRouter } from 'expo-router';
 import {
   View,
   Text,
@@ -13,39 +14,36 @@ import {
   ActivityIndicator,
   Image,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { apiPost } from '@/utils/api';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-
-const BACKEND_URL = 'https://erm5magsz6azuge4mtdkxhsmzj7uqr45.app.specular.dev';
 
 const RELATIONSHIP_GOALS = [
   'Long-term relationship',
   'Marriage',
+  'Casual dating',
+  'Friendship',
+  'Networking',
+  'Travel partner',
+  'Activity partner',
   'Life partner',
-  'Serious dating',
   'Companionship',
-  'Deep connection',
-  'Emotional intimacy',
-  'Building a family',
-  'Finding my person',
-  'Committed relationship',
-  'Exclusive dating',
-  'Partnership',
-  'Soulmate',
-  'Meaningful connection',
-  'Intentional dating',
-  'Authentic relationship',
-  'Slow dating',
-  'Quality over quantity',
-  'No games',
-  'Real connection',
-  'Genuine partnership',
+  'Romance',
+  'Serious relationship',
+  'Open to anything',
+  'Something casual',
+  'New friends',
+  'Creative collaboration',
+  'Fitness partner',
+  'Dining companion',
+  'Cultural experiences',
+  'Adventure buddy',
+  'Intellectual connection',
+  'Emotional support',
 ];
 
 export default function ApplicationScreen() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [age, setAge] = useState('');
@@ -56,54 +54,64 @@ export default function ApplicationScreen() {
   const [phone, setPhone] = useState('');
   const [lookingFor, setLookingFor] = useState<string[]>([]);
   const [additionalInfo, setAdditionalInfo] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const toggleLookingFor = (option: string) => {
     if (lookingFor.includes(option)) {
       setLookingFor(lookingFor.filter((item) => item !== option));
     } else {
-      if (lookingFor.length >= 5) {
-        Alert.alert('Maximum Reached', 'You can select up to 5 relationship goals.');
-        return;
+      if (lookingFor.length < 5) {
+        setLookingFor([...lookingFor, option]);
+      } else {
+        Alert.alert('Maximum Selection', 'You can select up to 5 options only.');
       }
-      setLookingFor([...lookingFor, option]);
     }
   };
 
   const handleSubmit = async () => {
     // Validation
-    if (!firstName.trim() || !lastName.trim()) {
-      Alert.alert('Error', 'Please enter your first and last name.');
+    if (!firstName.trim()) {
+      Alert.alert('Required Field', 'Please enter your first name.');
       return;
     }
-
-    const ageNum = parseInt(age);
-    if (!age || isNaN(ageNum) || ageNum < 18 || ageNum > 100) {
-      Alert.alert('Error', 'Please enter a valid age (18-100).');
+    if (!lastName.trim()) {
+      Alert.alert('Required Field', 'Please enter your last name.');
       return;
     }
-
-    if (!city.trim() || !provinceState.trim() || !country.trim()) {
-      Alert.alert('Error', 'Please enter your complete location.');
+    if (!age.trim() || isNaN(Number(age)) || Number(age) < 18) {
+      Alert.alert('Invalid Age', 'Please enter a valid age (18 or older).');
       return;
     }
-
+    if (!city.trim()) {
+      Alert.alert('Required Field', 'Please enter your city.');
+      return;
+    }
+    if (!provinceState.trim()) {
+      Alert.alert('Required Field', 'Please enter your province/state.');
+      return;
+    }
+    if (!country.trim()) {
+      Alert.alert('Required Field', 'Please enter your country.');
+      return;
+    }
     if (!email.trim() || !email.includes('@')) {
-      Alert.alert('Error', 'Please enter a valid email address.');
+      Alert.alert('Invalid Email', 'Please enter a valid email address.');
       return;
     }
-
     if (lookingFor.length === 0) {
-      Alert.alert('Error', 'Please select at least one relationship goal.');
+      Alert.alert('Required Field', 'Please select at least one option for what you are looking for.');
       return;
     }
 
     setLoading(true);
-
     try {
-      const requestBody = {
+      // TODO: Backend Integration - Submit waitlist application to POST /api/waitlist/apply
+      // The backend should validate and store: firstName, lastName, age, city, provinceState, 
+      // country, email, phone (optional), lookingFor (1-5 items), additionalInfo (optional)
+      await apiPost('/api/waitlist/apply', {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        age: ageNum,
+        age: Number(age),
         city: city.trim(),
         provinceState: provinceState.trim(),
         country: country.trim(),
@@ -111,52 +119,12 @@ export default function ApplicationScreen() {
         phone: phone.trim() || undefined,
         lookingFor,
         additionalInfo: additionalInfo.trim() || undefined,
-      };
-
-      console.log('Submitting application to:', `${BACKEND_URL}/api/waitlist/apply`);
-      console.log('Request body:', JSON.stringify(requestBody, null, 2));
-
-      const response = await fetch(`${BACKEND_URL}/api/waitlist/apply`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
       });
 
-      console.log('Response status:', response.status);
-      const responseText = await response.text();
-      console.log('Response text:', responseText);
-
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status} - ${responseText}`);
-      }
-
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (e) {
-        console.log('Response is not JSON, treating as success');
-        data = { success: true };
-      }
-
-      console.log('Application submitted successfully:', data);
-      
-      // Navigate to confirmation screen
-      console.log('Navigating to confirmation screen...');
-      router.replace('/waitlist/confirmation');
-      
+      router.push('/waitlist/confirmation');
     } catch (error: any) {
-      console.error('Application submission error:', error);
-      console.error('Error details:', {
-        message: error.message,
-        stack: error.stack,
-      });
-      
-      Alert.alert(
-        'Submission Failed',
-        `Unable to submit your application. Please try again.\n\nError: ${error.message}`
-      );
+      console.log('Application submission error:', error);
+      Alert.alert('Error', error.message || 'Failed to submit application. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -164,55 +132,51 @@ export default function ApplicationScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-      >
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
+      <LinearGradient colors={['#1a1a2e', '#16213e']} style={styles.gradient}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardView}
         >
-          {/* Header */}
-          <View style={styles.header}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
             <Image
-              source={require('@/assets/images/final_quest_240x240.png')}
+              source={require('@/assets/images/9d78a159-4b83-473c-a4f1-55affbc6fcf0.png')}
               style={styles.logo}
               resizeMode="contain"
             />
-            <Text style={styles.title}>Join Intentional</Text>
-            <Text style={styles.subtitle}>
-              Tell us about yourself to join our verified community
-            </Text>
-          </View>
 
-          {/* Form */}
-          <View style={styles.form}>
-            {/* Name */}
-            <View style={styles.row}>
-              <View style={[styles.inputContainer, { flex: 1, marginRight: 8 }]}>
-                <Text style={styles.label}>First Name *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={firstName}
-                  onChangeText={setFirstName}
-                  placeholder="John"
-                  placeholderTextColor="#999"
-                  autoCapitalize="words"
-                />
-              </View>
-              <View style={[styles.inputContainer, { flex: 1, marginLeft: 8 }]}>
-                <Text style={styles.label}>Last Name *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={lastName}
-                  onChangeText={setLastName}
-                  placeholder="Doe"
-                  placeholderTextColor="#999"
-                  autoCapitalize="words"
-                />
-              </View>
+            <Text style={styles.title}>Join the Waitlist</Text>
+            <Text style={styles.subtitle}>
+              Complete your application to join our exclusive community
+            </Text>
+
+            {/* First Name */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>First Name *</Text>
+              <TextInput
+                style={styles.input}
+                value={firstName}
+                onChangeText={setFirstName}
+                placeholder="Enter your first name"
+                placeholderTextColor="#666"
+                autoCapitalize="words"
+              />
+            </View>
+
+            {/* Last Name */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Last Name *</Text>
+              <TextInput
+                style={styles.input}
+                value={lastName}
+                onChangeText={setLastName}
+                placeholder="Enter your last name"
+                placeholderTextColor="#666"
+                autoCapitalize="words"
+              />
             </View>
 
             {/* Age */}
@@ -222,145 +186,142 @@ export default function ApplicationScreen() {
                 style={styles.input}
                 value={age}
                 onChangeText={setAge}
-                placeholder="25"
-                placeholderTextColor="#999"
+                placeholder="Enter your age"
+                placeholderTextColor="#666"
                 keyboardType="number-pad"
-                maxLength={2}
               />
             </View>
 
-            {/* Location */}
+            {/* City */}
             <View style={styles.inputContainer}>
               <Text style={styles.label}>City *</Text>
               <TextInput
                 style={styles.input}
                 value={city}
                 onChangeText={setCity}
-                placeholder="New York"
-                placeholderTextColor="#999"
+                placeholder="Enter your city"
+                placeholderTextColor="#666"
                 autoCapitalize="words"
               />
             </View>
 
-            <View style={styles.row}>
-              <View style={[styles.inputContainer, { flex: 1, marginRight: 8 }]}>
-                <Text style={styles.label}>Province/State *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={provinceState}
-                  onChangeText={setProvinceState}
-                  placeholder="NY"
-                  placeholderTextColor="#999"
-                  autoCapitalize="characters"
-                />
-              </View>
-              <View style={[styles.inputContainer, { flex: 1, marginLeft: 8 }]}>
-                <Text style={styles.label}>Country *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={country}
-                  onChangeText={setCountry}
-                  placeholder="USA"
-                  placeholderTextColor="#999"
-                  autoCapitalize="words"
-                />
-              </View>
+            {/* Province/State */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Province/State *</Text>
+              <TextInput
+                style={styles.input}
+                value={provinceState}
+                onChangeText={setProvinceState}
+                placeholder="Enter your province or state"
+                placeholderTextColor="#666"
+                autoCapitalize="words"
+              />
             </View>
 
-            {/* Contact */}
+            {/* Country */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Country *</Text>
+              <TextInput
+                style={styles.input}
+                value={country}
+                onChangeText={setCountry}
+                placeholder="Enter your country"
+                placeholderTextColor="#666"
+                autoCapitalize="words"
+              />
+            </View>
+
+            {/* Email */}
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Email *</Text>
               <TextInput
                 style={styles.input}
                 value={email}
                 onChangeText={setEmail}
-                placeholder="john@example.com"
-                placeholderTextColor="#999"
+                placeholder="Enter your email"
+                placeholderTextColor="#666"
                 keyboardType="email-address"
                 autoCapitalize="none"
-                autoCorrect={false}
               />
             </View>
 
+            {/* Phone (Optional) */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Phone (Optional)</Text>
+              <Text style={styles.label}>Phone Number (Optional)</Text>
               <TextInput
                 style={styles.input}
                 value={phone}
                 onChangeText={setPhone}
-                placeholder="+1 (555) 123-4567"
-                placeholderTextColor="#999"
+                placeholder="Enter your phone number"
+                placeholderTextColor="#666"
                 keyboardType="phone-pad"
               />
             </View>
 
-            {/* Relationship Goals */}
+            {/* What are you looking for */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>
-                What are you looking for? * (Select 1-5)
-              </Text>
-              <Text style={styles.helperText}>
-                {lookingFor.length}/5 selected
-              </Text>
-              <View style={styles.optionsGrid}>
-                {RELATIONSHIP_GOALS.map((goal) => (
+              <Text style={styles.label}>What are you looking for? * (Select up to 5)</Text>
+              <Text style={styles.selectedCount}>{lookingFor.length}/5 selected</Text>
+              <View style={styles.optionsContainer}>
+                {RELATIONSHIP_GOALS.map((option) => (
                   <TouchableOpacity
-                    key={goal}
+                    key={option}
                     style={[
-                      styles.option,
-                      lookingFor.includes(goal) && styles.optionSelected,
+                      styles.optionButton,
+                      lookingFor.includes(option) && styles.optionButtonSelected,
                     ]}
-                    onPress={() => toggleLookingFor(goal)}
-                    activeOpacity={0.7}
+                    onPress={() => toggleLookingFor(option)}
                   >
                     <Text
                       style={[
                         styles.optionText,
-                        lookingFor.includes(goal) && styles.optionTextSelected,
+                        lookingFor.includes(option) && styles.optionTextSelected,
                       ]}
                     >
-                      {goal}
+                      {option}
                     </Text>
                   </TouchableOpacity>
                 ))}
               </View>
             </View>
 
-            {/* Additional Info */}
+            {/* Additional Information (Optional) */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>
-                Tell us more about yourself (Optional)
-              </Text>
+              <Text style={styles.label}>Additional Information (Optional)</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
                 value={additionalInfo}
                 onChangeText={setAdditionalInfo}
-                placeholder="Share anything else you'd like us to know..."
-                placeholderTextColor="#999"
+                placeholder="Tell us more about yourself..."
+                placeholderTextColor="#666"
                 multiline
                 numberOfLines={4}
                 textAlignVertical="top"
               />
             </View>
-          </View>
 
-          {/* Submit Button */}
-          <TouchableOpacity
-            style={[styles.submitButton, loading && styles.submitButtonDisabled]}
-            onPress={handleSubmit}
-            disabled={loading}
-            activeOpacity={0.8}
-          >
-            {loading ? (
-              <ActivityIndicator color="#FFFFFF" />
-            ) : (
-              <Text style={styles.submitButtonText}>Submit Application</Text>
-            )}
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.submitButton, loading && styles.submitButtonDisabled]}
+              onPress={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.submitButtonText}>Submit Application</Text>
+              )}
+            </TouchableOpacity>
 
-          <View style={{ height: 40 }} />
-        </ScrollView>
-      </KeyboardAvoidingView>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => router.back()}
+              disabled={loading}
+            >
+              <Text style={styles.backButtonText}>Go Back</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </LinearGradient>
     </SafeAreaView>
   );
 }
@@ -368,124 +329,110 @@ export default function ApplicationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#1a1a2e',
+  },
+  gradient: {
+    flex: 1,
   },
   keyboardView: {
     flex: 1,
   },
-  scrollView: {
-    flex: 1,
-  },
   scrollContent: {
-    paddingHorizontal: 24,
-  },
-  header: {
-    alignItems: 'center',
-    paddingTop: 24,
-    paddingBottom: 32,
+    padding: 24,
+    paddingBottom: 40,
   },
   logo: {
     width: 80,
     height: 80,
-    marginBottom: 16,
+    alignSelf: 'center',
+    marginBottom: 24,
   },
   title: {
-    fontSize: 32,
-    fontWeight: '300',
-    color: '#FFFFFF',
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
     marginBottom: 8,
-    letterSpacing: 0.5,
   },
   subtitle: {
     fontSize: 16,
-    color: '#999999',
+    color: '#aaa',
     textAlign: 'center',
-    lineHeight: 22,
-  },
-  form: {
-    gap: 20,
-  },
-  row: {
-    flexDirection: 'row',
+    marginBottom: 32,
   },
   inputContainer: {
-    marginBottom: 4,
+    marginBottom: 20,
   },
   label: {
     fontSize: 14,
-    fontWeight: '500',
-    color: '#FFFFFF',
+    fontWeight: '600',
+    color: '#fff',
     marginBottom: 8,
   },
-  helperText: {
-    fontSize: 12,
-    color: '#666666',
-    marginBottom: 12,
-  },
   input: {
-    backgroundColor: '#1A1A1A',
-    borderWidth: 1,
-    borderColor: '#333333',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    padding: 16,
     fontSize: 16,
-    color: '#FFFFFF',
+    color: '#fff',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   textArea: {
     height: 100,
-    paddingTop: 14,
+    paddingTop: 16,
   },
-  optionsGrid: {
+  selectedCount: {
+    fontSize: 12,
+    color: '#aaa',
+    marginBottom: 12,
+  },
+  optionsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: 8,
   },
-  option: {
-    backgroundColor: '#1A1A1A',
-    borderWidth: 1,
-    borderColor: '#333333',
+  optionButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 20,
-    paddingHorizontal: 16,
     paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
-  optionSelected: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#FFFFFF',
+  optionButtonSelected: {
+    backgroundColor: '#e94560',
+    borderColor: '#e94560',
   },
   optionText: {
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#fff',
   },
   optionTextSelected: {
-    color: '#000000',
-    fontWeight: '500',
+    fontWeight: '600',
   },
   submitButton: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 30,
-    paddingVertical: 16,
+    backgroundColor: '#e94560',
+    borderRadius: 12,
+    padding: 18,
     alignItems: 'center',
-    marginTop: 32,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#FFF',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+    marginTop: 12,
   },
   submitButtonDisabled: {
     opacity: 0.6,
   },
   submitButtonText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#000000',
-    letterSpacing: 0.5,
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  backButton: {
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  backButtonText: {
+    fontSize: 14,
+    color: '#aaa',
   },
 });
