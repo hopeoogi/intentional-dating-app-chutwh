@@ -1,8 +1,15 @@
 
 import React, { useEffect } from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Dimensions,
+} from 'react-native';
 import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
+
+const { width, height } = Dimensions.get('window');
 
 export default function WelcomeScreen() {
   const router = useRouter();
@@ -16,35 +23,38 @@ export default function WelcomeScreen() {
   }, []);
 
   return (
-    <LinearGradient
-      colors={['#000000', '#1a1a1a']}
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <Image
-        source={require('@/assets/images/natively-dark.png')}
-        style={styles.image}
-        resizeMode="contain"
+        source={require('@/assets/images/20a729de-51e9-4557-ad66-b94976427a0c.jpeg')}
+        style={styles.backgroundImage}
+        resizeMode="cover"
       />
-      <Text style={styles.title}>Intentional</Text>
-    </LinearGradient>
+      <View style={styles.overlay}>
+        <Text style={styles.appName}>Intentional</Text>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  backgroundImage: {
+    width,
+    height,
+    position: 'absolute',
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  image: {
-    width: 200,
-    height: 200,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 36,
-    fontWeight: 'bold',
+  appName: {
+    fontSize: 48,
+    fontWeight: '700',
     color: '#FFFFFF',
-    letterSpacing: 1,
+    letterSpacing: 2,
   },
 });
