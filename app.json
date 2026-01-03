@@ -1,48 +1,56 @@
 {
   "expo": {
-    "name": "Intentional Dating",
+    "name": "Intentional",
     "slug": "intentional-dating",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/4d0f378c-70e0-4a39-bf69-e51a95b5c630.png",
-    "userInterfaceStyle": "dark",
+    "icon": "./assets/images/final_quest_240x240.png",
+    "scheme": "intentional",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/4d0f378c-70e0-4a39-bf69-e51a95b5c630.png",
+      "image": "./assets/images/final_quest_240x240.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0A0A0A"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.intentionaldating.app",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
+      "bundleIdentifier": "com.intentional.dating"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/4d0f378c-70e0-4a39-bf69-e51a95b5c630.png",
-        "backgroundColor": "#0A0A0A"
+        "foregroundImage": "./assets/images/final_quest_240x240.png",
+        "backgroundColor": "#000000"
       },
-      "edgeToEdgeEnabled": true,
-      "package": "com.intentionaldating.app"
+      "package": "com.intentional.dating"
     },
     "web": {
-      "favicon": "./assets/images/4d0f378c-70e0-4a39-bf69-e51a95b5c630.png",
-      "bundler": "metro"
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/final_quest_240x240.png"
     },
     "plugins": [
-      "expo-font",
       "expo-router",
-      "expo-web-browser",
-      "expo-secure-store"
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#000000",
+          "image": "./assets/images/final_quest_240x240.png",
+          "imageWidth": 200
+        }
+      ]
     ],
-    "scheme": "natively",
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
-      "router": {},
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "your-project-id"
+      },
+      "apiUrl": "http://localhost:3000",
       "backendUrl": "https://erm5magsz6azuge4mtdkxhsmzj7uqr45.app.specular.dev"
     }
   }

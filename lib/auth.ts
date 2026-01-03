@@ -4,8 +4,10 @@ import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 import Constants from "expo-constants";
 
-const API_URL = "https://erm5magsz6azuge4mtdkxhsmzj7uqr45.app.specular.dev";
+// Use backend URL from app.json configuration
+const API_URL = Constants.expoConfig?.extra?.backendUrl || "";
 
+// Bearer token key must match the one in utils/api.ts
 const BEARER_TOKEN_KEY = "intentional_dating_bearer_token";
 
 // Platform-specific storage: localStorage for web, SecureStore for native

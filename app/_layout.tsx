@@ -1,50 +1,26 @@
 
+import "react-native-reanimated";
+import React, { useEffect } from "react";
 import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { SystemBars } from "react-native-edge-to-edge";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useColorScheme } from "react-native";
 import {
   DarkTheme,
   DefaultTheme,
   Theme,
   ThemeProvider,
 } from "@react-navigation/native";
-import "react-native-reanimated";
-import { useColorScheme } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
-import * as SplashScreen from "expo-splash-screen";
-import { SystemBars } from "react-native-edge-to-edge";
-import { Stack } from "expo-router";
-import React, { useEffect } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { colors } from "@/styles/commonStyles";
-import { BACKEND_URL, healthCheck, isBackendConfigured } from "@/utils/api";
+import { BACKEND_URL, healthCheck } from "@/utils/api";
 
-// Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 
-// Log backend URL at startup for debugging
-console.log('[App] Backend URL configured:', BACKEND_URL);
-console.log('[App] Backend configured:', isBackendConfigured());
-
-// Perform health check on startup
-if (isBackendConfigured()) {
-  healthCheck().then((healthy) => {
-    if (!healthy) {
-      console.warn('[App] Backend health check failed - API may be unavailable');
-    }
-  });
-}
-
-// Custom dark theme for the app
-const CustomDarkTheme: Theme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    background: colors.background,
-    card: colors.card,
-    text: colors.text,
-    border: colors.border,
-    primary: colors.primary,
-  },
+export const unstable_settings = {
+  initialRouteName: "index",
 };
 
 export default function RootLayout() {
@@ -59,32 +35,49 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
+  useEffect(() => {
+    // Log backend URL and perform health check on app startup
+    console.log('[App] Backend URL configured:', BACKEND_URL);
+    healthCheck().then((healthy) => {
+      if (healthy) {
+        console.log('[App] Backend is reachable ✓');
+      } else {
+        console.warn('[App] Backend health check failed - API calls may fail');
+      }
+    });
+  }, []);
+
   if (!loaded) {
     return null;
   }
 
+  const CustomDarkTheme: Theme = {
+    ...DarkTheme,
+    colors: {
+      ...DarkTheme.colors,
+      primary: "rgb(10, 132, 255)",
+      background: "rgb(1, 1, 1)",
+      card: "rgb(28, 28, 30)",
+      text: "rgb(255, 255, 255)",
+      border: "rgb(44, 44, 46)",
+      notification: "rgb(255, 69, 58)",
+    },
+  };
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
-        <ThemeProvider value={CustomDarkTheme}>
-          <SystemBars style="light" />
-          <StatusBar style="light" />
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: colors.background },
-            }}
-          >
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="auth/sign-in" />
-            <Stack.Screen name="auth/sign-up" />
-            <Stack.Screen name="auth/profile-setup" />
-            <Stack.Screen name="auth-popup" />
-            <Stack.Screen name="auth-callback" />
-            <Stack.Screen name="chat/[id]" />
-          </Stack>
-        </ThemeProvider>
-      </AuthProvider>
-    </GestureHandlerRootView>
+    <>
+      <StatusBar style="light" animated />
+      <ThemeProvider value={CustomDarkTheme}>
+        <AuthProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="waitlist" />
+            </Stack>
+            <SystemBars style="light" />
+          </GestureHandlerRootView>
+        </AuthProvider>
+      </ThemeProvider>
+    </>
   );
 }
