@@ -15,7 +15,7 @@ import {
   Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { apiPost } from '@/utils/api';
+import { apiPost, isBackendConfigured, BACKEND_URL } from '@/utils/api';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const RELATIONSHIP_GOALS = [
@@ -69,6 +69,8 @@ export default function ApplicationScreen() {
   };
 
   const handleSubmit = async () => {
+    console.log('=== Submit Application Started ===');
+    
     // Validation
     if (!firstName.trim()) {
       Alert.alert('Required Field', 'Please enter your first name.');
@@ -103,12 +105,13 @@ export default function ApplicationScreen() {
       return;
     }
 
+    console.log('Validation passed');
+    console.log('Backend configured:', isBackendConfigured());
+    console.log('Backend URL:', BACKEND_URL);
+
     setLoading(true);
     try {
-      // TODO: Backend Integration - Submit waitlist application to POST /api/waitlist/apply
-      // The backend should validate and store: firstName, lastName, age, city, provinceState, 
-      // country, email, phone (optional), lookingFor (1-5 items), additionalInfo (optional)
-      await apiPost('/api/waitlist/apply', {
+      const applicationData = {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         age: Number(age),
@@ -119,14 +122,43 @@ export default function ApplicationScreen() {
         phone: phone.trim() || undefined,
         lookingFor,
         additionalInfo: additionalInfo.trim() || undefined,
-      });
+      };
 
+      console.log('Submitting application data:', applicationData);
+
+      // TODO: Backend Integration - Submit waitlist application to POST /api/waitlist/apply
+      // The backend should validate and store: firstName, lastName, age, city, provinceState, 
+      // country, email, phone (optional), lookingFor (1-5 items), additionalInfo (optional)
+      const response = await apiPost('/api/waitlist/apply', applicationData);
+
+      console.log('Application submitted successfully:', response);
+      console.log('Navigating to confirmation screen...');
+
+      // Navigate to confirmation screen
       router.push('/waitlist/confirmation');
+      
+      console.log('Navigation triggered');
     } catch (error: any) {
-      console.log('Application submission error:', error);
-      Alert.alert('Error', error.message || 'Failed to submit application. Please try again.');
+      console.error('=== Application submission error ===');
+      console.error('Error type:', error.constructor.name);
+      console.error('Error message:', error.message);
+      console.error('Full error:', error);
+      
+      // Show user-friendly error message
+      let errorMessage = 'Failed to submit application. Please try again.';
+      
+      if (error.message?.includes('Backend URL not configured')) {
+        errorMessage = 'Backend is not configured. Please contact support.';
+      } else if (error.message?.includes('Network')) {
+        errorMessage = 'Network error. Please check your internet connection.';
+      } else if (error.message?.includes('API error')) {
+        errorMessage = error.message;
+      }
+      
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
+      console.log('=== Submit Application Ended ===');
     }
   };
 
