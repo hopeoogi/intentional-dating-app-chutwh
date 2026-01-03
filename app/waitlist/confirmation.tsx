@@ -1,6 +1,5 @@
 
 import React, { useEffect } from 'react';
-import { useRouter } from 'expo-router';
 import {
   View,
   Text,
@@ -8,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -15,97 +15,76 @@ export default function ConfirmationScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <LinearGradient colors={['#1a1a2e', '#16213e']} style={styles.gradient}>
+    <LinearGradient colors={['#1a1a1a', '#000000']} style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
           <Image
-            source={require('@/assets/images/9d78a159-4b83-473c-a4f1-55affbc6fcf0.png')}
+            source={require('@/assets/images/final_quest_240x240.png')}
             style={styles.logo}
             resizeMode="contain"
           />
 
-          <View style={styles.checkmarkContainer}>
-            <Text style={styles.checkmark}>✓</Text>
-          </View>
-
           <Text style={styles.title}>Application Received!</Text>
 
           <Text style={styles.message}>
-            Your application has been successfully received and you are now in our waitlist. We will contact you when your application has been approved.
+            Your application has been successfully received and you are now in our
+            waitlist. We will contact you when your application has been approved.
           </Text>
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.replace('/auth/sign-in')}
+            onPress={() => router.push('/waitlist/sign-in')}
           >
-            <Text style={styles.buttonText}>Return to Sign In</Text>
+            <Text style={styles.buttonText}>Back to Home</Text>
           </TouchableOpacity>
         </View>
-      </LinearGradient>
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
   },
-  gradient: {
+  safeArea: {
     flex: 1,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 32,
+    paddingHorizontal: 32,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 120,
+    height: 120,
     marginBottom: 32,
-  },
-  checkmarkContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(76, 175, 80, 0.2)',
-    borderWidth: 3,
-    borderColor: '#4CAF50',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  checkmark: {
-    fontSize: 48,
-    color: '#4CAF50',
-    fontWeight: 'bold',
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 24,
     textAlign: 'center',
-    marginBottom: 16,
   },
   message: {
     fontSize: 16,
-    color: '#aaa',
+    color: '#CCCCCC',
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 48,
   },
   button: {
-    backgroundColor: '#e94560',
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
     paddingVertical: 16,
     paddingHorizontal: 48,
-    minWidth: 200,
+    borderRadius: 30,
     alignItems: 'center',
   },
   buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#000000',
   },
 });
