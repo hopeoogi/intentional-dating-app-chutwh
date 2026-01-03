@@ -10,44 +10,41 @@ export default function ConfirmationScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <LinearGradient colors={['#000000', '#1a1a1a']} style={styles.gradient}>
+    <LinearGradient colors={['#000000', '#1a1a1a']} style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
           <View style={styles.iconContainer}>
-            <IconSymbol 
-              ios_icon_name="checkmark.circle.fill" 
-              android_material_icon_name="check-circle" 
-              size={80} 
-              color="#fff" 
-            />
+            <IconSymbol name="checkmark.circle.fill" size={80} color="#4CAF50" />
           </View>
 
-          <Text style={styles.title}>Application Submitted!</Text>
+          <Text style={styles.title}>You're on the list!</Text>
+          
           <Text style={styles.message}>
-            Thank you for your interest in joining our exclusive community.
+            Thank you for joining our waitlist! We review all applications and when
+            you are approved we will contact you.
           </Text>
-          <Text style={styles.submessage}>
-            We&apos;ll review your application and get back to you soon via email.
+
+          <Text style={styles.subMessage}>
+            Keep an eye on your email for updates.
           </Text>
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push('/waitlist/welcome')}
+            onPress={() => router.replace('/')}
           >
             <Text style={styles.buttonText}>Back to Home</Text>
           </TouchableOpacity>
         </View>
-      </LinearGradient>
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
   },
-  gradient: {
+  safeArea: {
     flex: 1,
   },
   content: {
@@ -61,34 +58,35 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#fff',
     marginBottom: 16,
     textAlign: 'center',
   },
   message: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#999',
     textAlign: 'center',
     marginBottom: 12,
-    paddingHorizontal: 20,
+    lineHeight: 24,
   },
-  submessage: {
-    fontSize: 16,
+  subMessage: {
+    fontSize: 14,
     color: '#666',
     textAlign: 'center',
     marginBottom: 48,
-    paddingHorizontal: 20,
   },
   button: {
     backgroundColor: '#fff',
-    borderRadius: 12,
+    paddingHorizontal: 32,
     paddingVertical: 16,
-    paddingHorizontal: 48,
+    borderRadius: 12,
+    minWidth: 200,
+    alignItems: 'center',
   },
   buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '700',
     color: '#000',
   },
 });
