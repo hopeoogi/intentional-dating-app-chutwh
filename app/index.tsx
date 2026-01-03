@@ -15,11 +15,17 @@ export default function WelcomeScreen() {
   const router = useRouter();
 
   useEffect(() => {
+    console.log('[Welcome] Welcome screen mounted');
+    
     const timer = setTimeout(() => {
-      router.replace('/auth/sign-in');
+      console.log('[Welcome] Navigating to waitlist/welcome...');
+      router.replace('/waitlist/welcome');
     }, 3000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      console.log('[Welcome] Cleaning up timer');
+      clearTimeout(timer);
+    };
   }, []);
 
   return (

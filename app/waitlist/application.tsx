@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { apiPost, BACKEND_URL, isBackendConfigured } from '@/utils/api';
+import { apiPost, BACKEND_URL, isBackendConfigured, healthCheck } from '@/utils/api';
 
 const RELATIONSHIP_GOALS = [
   'Long-term relationship',
@@ -54,6 +54,32 @@ export default function ApplicationScreen() {
   const [lookingFor, setLookingFor] = useState<string[]>([]);
   const [additionalInfo, setAdditionalInfo] = useState('');
   const [loading, setLoading] = useState(false);
+  const [backendHealthy, setBackendHealthy] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    // Check backend health on mount
+    checkBackendHealth();
+  }, []);
+
+  const checkBackendHealth = async () => {
+    console.log('[Application] Checking backend health...');
+    const healthy = await healthCheck();
+    setBackendHealthy(healthy);
+    
+    if (!healthy) {
+      console.error('[Application] ❌ Backend is not healthy');
+      Alert.alert(
+        'Connection Issue',
+        'Unable to connect to the server. Please check your internet connection and try again.',
+        [
+          { text: 'Retry', onPress: checkBackendHealth },
+          { text: 'Continue Anyway', style: 'cancel' }
+        ]
+      );
+    } else {
+      console.log('[Application] ✅ Backend is healthy');
+    }
+  };
 
   const toggleLookingFor = (option: string) => {
     if (lookingFor.includes(option)) {
@@ -72,42 +98,53 @@ export default function ApplicationScreen() {
   };
 
   const handleSubmit = async () => {
-    console.log('[Application] Starting submission...');
+    console.log('[Application] ========================================');
+    console.log('[Application] Starting submission process...');
+    console.log('[Application] ========================================');
     
     // Validation
     if (!name.trim()) {
+      console.log('[Application] Validation failed: name is empty');
       Alert.alert('Error', 'Please enter your name');
       return;
     }
     if (!age.trim() || isNaN(Number(age)) || Number(age) < 18) {
+      console.log('[Application] Validation failed: invalid age');
       Alert.alert('Error', 'Please enter a valid age (18+)');
       return;
     }
     if (!location.trim()) {
+      console.log('[Application] Validation failed: location is empty');
       Alert.alert('Error', 'Please enter your location');
       return;
     }
     if (!email.trim() || !email.includes('@')) {
+      console.log('[Application] Validation failed: invalid email');
       Alert.alert('Error', 'Please enter a valid email');
       return;
     }
     if (lookingFor.length === 0) {
+      console.log('[Application] Validation failed: no relationship goals selected');
       Alert.alert('Error', 'Please select at least one relationship goal');
       return;
     }
 
+    console.log('[Application] ✅ All validations passed');
+
     // Check backend configuration
     if (!isBackendConfigured()) {
-      console.error('[Application] Backend not configured');
+      console.error('[Application] ❌ Backend not configured');
       Alert.alert(
         'Configuration Error',
-        'Backend is not configured. Please contact support.'
+        'Backend is not configured. Please contact support.\n\nBackend URL: ' + (BACKEND_URL || 'NOT SET')
       );
       return;
     }
 
+    console.log('[Application] ✅ Backend is configured');
     console.log('[Application] Backend URL:', BACKEND_URL);
-    console.log('[Application] Submitting data:', {
+
+    const payload = {
       name: name.trim(),
       age: Number(age),
       location: location.trim(),
@@ -115,52 +152,63 @@ export default function ApplicationScreen() {
       phone: phone.trim() || undefined,
       lookingFor,
       additionalInfo: additionalInfo.trim() || undefined,
-    });
+    };
+
+    console.log('[Application] Payload prepared:', JSON.stringify(payload, null, 2));
 
     setLoading(true);
 
     try {
-      const payload = {
-        name: name.trim(),
-        age: Number(age),
-        location: location.trim(),
-        email: email.trim().toLowerCase(),
-        phone: phone.trim() || undefined,
-        lookingFor,
-        additionalInfo: additionalInfo.trim() || undefined,
-      };
-
-      console.log('[Application] Calling API with payload:', payload);
+      console.log('[Application] Calling API endpoint: /api/waitlist/apply');
       
       const response = await apiPost('/api/waitlist/apply', payload);
 
-      console.log('[Application] Application submitted successfully:', response);
+      console.log('[Application] ✅✅✅ Application submitted successfully!');
+      console.log('[Application] Response:', response);
       
       // Navigate to confirmation
+      console.log('[Application] Navigating to confirmation screen...');
       router.push('/waitlist/confirmation');
     } catch (error: any) {
-      console.error('[Application] Submission error:', error);
-      console.error('[Application] Error details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-      });
+      console.error('[Application] ❌❌❌ Submission error occurred');
+      console.error('[Application] Error type:', error.constructor.name);
+      console.error('[Application] Error message:', error.message);
+      console.error('[Application] Error stack:', error.stack);
       
       let errorMessage = 'Failed to submit application. Please try again.';
+      let errorDetails = '';
       
       if (error.message?.includes('duplicate') || error.message?.includes('already exists')) {
         errorMessage = 'This email is already registered. Please use a different email.';
-      } else if (error.message?.includes('Network')) {
+      } else if (error.message?.includes('Network') || error.message?.includes('network')) {
         errorMessage = 'Network error. Please check your internet connection and try again.';
+        errorDetails = '\n\nTip: Make sure you have a stable internet connection.';
       } else if (error.message?.includes('Backend URL not configured')) {
         errorMessage = 'App is not properly configured. Please contact support.';
+        errorDetails = '\n\nBackend URL: ' + (BACKEND_URL || 'NOT SET');
+      } else if (error.message?.includes('timeout')) {
+        errorMessage = 'Request timed out. Please try again.';
+        errorDetails = '\n\nThe server took too long to respond.';
+      } else if (error.message?.includes('API error')) {
+        errorMessage = error.message;
+        errorDetails = '\n\nPlease check your information and try again.';
       } else if (error.message) {
         errorMessage = error.message;
       }
       
-      Alert.alert('Submission Error', errorMessage);
+      console.error('[Application] Showing error to user:', errorMessage + errorDetails);
+      
+      Alert.alert(
+        'Submission Error', 
+        errorMessage + errorDetails,
+        [
+          { text: 'Test Connection', onPress: checkBackendHealth },
+          { text: 'Try Again', style: 'cancel' }
+        ]
+      );
     } finally {
       setLoading(false);
+      console.log('[Application] ========================================');
     }
   };
 
@@ -186,6 +234,21 @@ export default function ApplicationScreen() {
               <Text style={styles.subtitle}>
                 Tell us about yourself to join our community
               </Text>
+              
+              {backendHealthy === false && (
+                <View style={styles.warningBanner}>
+                  <Text style={styles.warningText}>⚠️ Connection issue detected</Text>
+                  <TouchableOpacity onPress={checkBackendHealth}>
+                    <Text style={styles.retryText}>Tap to retry</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              
+              {backendHealthy === true && (
+                <View style={styles.successBanner}>
+                  <Text style={styles.successText}>✅ Connected to server</Text>
+                </View>
+              )}
             </View>
 
             <View style={styles.form}>
@@ -319,6 +382,13 @@ export default function ApplicationScreen() {
                 )}
               </TouchableOpacity>
 
+              <TouchableOpacity
+                style={styles.testButton}
+                onPress={checkBackendHealth}
+              >
+                <Text style={styles.testButtonText}>🔍 Test Server Connection</Text>
+              </TouchableOpacity>
+
               <Text style={styles.disclaimer}>
                 By submitting, you agree to our community guidelines and privacy policy.
               </Text>
@@ -368,6 +438,38 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#999',
     textAlign: 'center',
+  },
+  warningBanner: {
+    marginTop: 16,
+    backgroundColor: '#ff9800',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  warningText: {
+    color: '#000',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  retryText: {
+    color: '#000',
+    fontWeight: '700',
+    fontSize: 12,
+    marginTop: 4,
+    textDecorationLine: 'underline',
+  },
+  successBanner: {
+    marginTop: 16,
+    backgroundColor: '#4caf50',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  successText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 12,
   },
   form: {
     width: '100%',
@@ -468,6 +570,20 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 17,
     fontWeight: '600',
+  },
+  testButton: {
+    backgroundColor: '#333',
+    paddingVertical: 12,
+    borderRadius: 20,
+    alignItems: 'center',
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#555',
+  },
+  testButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
   },
   disclaimer: {
     fontSize: 12,

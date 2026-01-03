@@ -17,6 +17,12 @@ const { width } = Dimensions.get('window');
 export default function SignInScreen() {
   const router = useRouter();
 
+  const handleJoinWaitlist = () => {
+    console.log('[Sign-In] Join Waitlist button pressed');
+    console.log('[Sign-In] Navigating to /waitlist/application');
+    router.push('/waitlist/application');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
@@ -36,7 +42,7 @@ export default function SignInScreen() {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => router.push('/waitlist/application')}
+              onPress={handleJoinWaitlist}
             >
               <Text style={styles.buttonText}>Join the Waitlist</Text>
             </TouchableOpacity>

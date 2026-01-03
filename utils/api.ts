@@ -1,3 +1,4 @@
+
 /**
  * API Utilities Template
  *
@@ -39,7 +40,9 @@ const BEARER_TOKEN_KEY = "intentional_dating_bearer_token";
  * Check if backend is properly configured
  */
 export const isBackendConfigured = (): boolean => {
-  return !!BACKEND_URL && BACKEND_URL.length > 0;
+  const configured = !!BACKEND_URL && BACKEND_URL.length > 0;
+  console.log('[API] Backend configured:', configured, 'URL:', BACKEND_URL);
+  return configured;
 };
 
 /**
@@ -67,21 +70,27 @@ export const getBearerToken = async (): Promise<string | null> => {
  *
  * @param endpoint - API endpoint path (e.g., '/users', '/auth/login')
  * @param options - Fetch options (method, headers, body, etc.)
- * @param retries - Number of retry attempts (default: 0)
+ * @param retries - Number of retry attempts (default: 1)
  * @returns Parsed JSON response
  * @throws Error if backend is not configured or request fails
  */
 export const apiCall = async <T = any>(
   endpoint: string,
   options?: RequestInit,
-  retries: number = 0
+  retries: number = 1
 ): Promise<T> => {
   if (!isBackendConfigured()) {
+    console.error('[API] Backend URL not configured in app.json');
     throw new Error("Backend URL not configured. Please rebuild the app.");
   }
 
   const url = `${BACKEND_URL}${endpoint}`;
-  console.log("[API] Calling:", url, options?.method || "GET");
+  console.log("[API] ========================================");
+  console.log("[API] Making request to:", url);
+  console.log("[API] Method:", options?.method || "GET");
+  console.log("[API] Headers:", options?.headers);
+  console.log("[API] Body:", options?.body);
+  console.log("[API] ========================================");
 
   try {
     const response = await fetch(url, {
@@ -92,20 +101,54 @@ export const apiCall = async <T = any>(
       },
     });
 
+    console.log("[API] Response status:", response.status);
+    console.log("[API] Response headers:", JSON.stringify(response.headers));
+
+    // Try to get response text first
+    const text = await response.text();
+    console.log("[API] Response text:", text);
+
     if (!response.ok) {
-      const text = await response.text();
-      console.error("[API] Error response:", response.status, text);
-      throw new Error(`API error: ${response.status} - ${text}`);
+      console.error("[API] ❌ Error response:", response.status, text);
+      
+      // Parse error message if JSON
+      let errorMessage = text;
+      try {
+        const errorJson = JSON.parse(text);
+        errorMessage = errorJson.message || errorJson.error || text;
+      } catch (e) {
+        // Not JSON, use text as-is
+      }
+      
+      throw new Error(`API error (${response.status}): ${errorMessage}`);
     }
 
-    const data = await response.json();
-    console.log("[API] Success:", data);
+    // Parse successful response
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("[API] Failed to parse response as JSON:", e);
+      throw new Error("Invalid response from server");
+    }
+
+    console.log("[API] ✅ Success:", data);
     return data;
   } catch (error: any) {
+    console.error("[API] ❌ Request failed:", error);
+    console.error("[API] Error name:", error.name);
+    console.error("[API] Error message:", error.message);
+    console.error("[API] Error stack:", error.stack);
+    
     // Retry on network errors if retries are available
-    if (retries > 0 && (error.message?.includes('Network') || error.message?.includes('fetch'))) {
-      console.log(`[API] Retrying... (${retries} attempts left)`);
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+    if (retries > 0 && (
+      error.message?.includes('Network') || 
+      error.message?.includes('fetch') ||
+      error.message?.includes('timeout') ||
+      error.name === 'TypeError'
+    )) {
+      console.log(`[API] 🔄 Retrying... (${retries} attempts left)`);
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
       return apiCall<T>(endpoint, options, retries - 1);
     }
     
@@ -116,9 +159,11 @@ export const apiCall = async <T = any>(
     } else if (error.message?.includes('Failed to fetch')) {
       console.error("[API] Failed to reach backend - backend may be down");
       throw new Error('Unable to reach server - please try again later');
+    } else if (error.name === 'TypeError' && !error.message?.includes('API error')) {
+      console.error("[API] Network/CORS error");
+      throw new Error('Connection error - please check your internet and try again');
     }
     
-    console.error("[API] Request failed:", error);
     throw error;
   }
 };
@@ -137,6 +182,9 @@ export const apiPost = async <T = any>(
   endpoint: string,
   data: any
 ): Promise<T> => {
+  console.log('[API] POST request - endpoint:', endpoint);
+  console.log('[API] POST request - data:', JSON.stringify(data, null, 2));
+  
   return apiCall<T>(endpoint, {
     method: "POST",
     body: JSON.stringify(data),
@@ -283,18 +331,25 @@ export const healthCheck = async (): Promise<boolean> => {
       return false;
     }
 
-    const response = await fetch(`${BACKEND_URL}/api/health`);
+    console.log('[API] Running health check...');
+    const response = await fetch(`${BACKEND_URL}/api/health`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
     const isHealthy = response.ok;
     
     if (isHealthy) {
-      console.log('[API] Backend health check passed ✓');
+      console.log('[API] ✅ Backend health check passed');
     } else {
-      console.error('[API] Backend health check failed:', response.status);
+      console.error('[API] ❌ Backend health check failed:', response.status);
     }
     
     return isHealthy;
   } catch (error) {
-    console.error('[API] Backend health check error:', error);
+    console.error('[API] ❌ Backend health check error:', error);
     return false;
   }
 };

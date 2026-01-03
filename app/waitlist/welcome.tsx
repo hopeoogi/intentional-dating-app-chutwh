@@ -10,17 +10,23 @@ export default function WelcomeScreen() {
   const router = useRouter();
 
   useEffect(() => {
+    console.log('[Waitlist Welcome] Screen mounted');
+    
     const timer = setTimeout(() => {
+      console.log('[Waitlist Welcome] Navigating to sign-in...');
       router.replace('/waitlist/sign-in');
     }, 3000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      console.log('[Waitlist Welcome] Cleaning up timer');
+      clearTimeout(timer);
+    };
   }, []);
 
   return (
     <View style={styles.container}>
       <Image
-        source={require('@/assets/images/1a782e7d-0165-4270-bbc7-3a0d29c7b7d7.jpeg')}
+        source={require('@/assets/images/20a729de-51e9-4557-ad66-b94976427a0c.jpeg')}
         style={styles.backgroundImage}
         resizeMode="cover"
       />

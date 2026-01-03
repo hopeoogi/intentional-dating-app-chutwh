@@ -1,7 +1,8 @@
+
 {
   "expo": {
-    "name": "Intentional Dating",
-    "slug": "Intentional Dating",
+    "name": "Intentional",
+    "slug": "intentional-dating",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/natively-dark.png",
@@ -44,6 +45,5 @@
       "router": {},
       "backendUrl": "https://erm5magsz6azuge4mtdkxhsmzj7uqr45.app.specular.dev"
     }
-  },
-  "scheme": "Intentional Dating"
+  }
 }
