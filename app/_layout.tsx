@@ -2,7 +2,7 @@
 import "react-native-reanimated";
 import React, { useEffect } from "react";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { SystemBars } from "react-native-edge-to-edge";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -16,20 +16,13 @@ import {
 } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { WidgetProvider } from "@/contexts/WidgetContext";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { BACKEND_URL, healthCheck } from "@/utils/api";
+import { isBackendConfigured } from "@/utils/api";
 
+// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-// Log backend configuration at app startup
-console.log('='.repeat(60));
-console.log('🚀 App Starting - Backend Configuration');
-console.log('='.repeat(60));
-console.log('Backend URL:', BACKEND_URL || '❌ NOT CONFIGURED');
-console.log('='.repeat(60));
-
 export const unstable_settings = {
-  initialRouteName: "index",
+  initialRouteName: "waitlist/welcome",
 };
 
 export default function RootLayout() {
@@ -43,14 +36,12 @@ export default function RootLayout() {
     if (loaded) {
       SplashScreen.hideAsync();
       
-      // Perform backend health check on app startup
-      healthCheck().then((isHealthy) => {
-        if (isHealthy) {
-          console.log('✅ Backend is reachable and healthy');
-        } else {
-          console.warn('⚠️ Backend health check failed - some features may not work');
-        }
-      });
+      // Check backend configuration on startup
+      if (!isBackendConfigured()) {
+        console.warn('[App] Backend URL not configured');
+      } else {
+        console.log('[App] Backend configured and ready');
+      }
     }
   }, [loaded]);
 
@@ -61,7 +52,7 @@ export default function RootLayout() {
     ) {
       Alert.alert(
         "🔌 You are offline",
-        "You can keep using the app! Your changes will be saved locally and synced when you are back online."
+        "Please connect to the internet to use Intentional."
       );
     }
   }, [networkState.isConnected, networkState.isInternetReachable]);
@@ -97,47 +88,52 @@ export default function RootLayout() {
 
   return (
     <>
-      <StatusBar style="auto" animated />
+      <StatusBar style="light" animated />
       <ThemeProvider
         value={colorScheme === "dark" ? CustomDarkTheme : CustomDefaultTheme}
       >
-        <AuthProvider>
-          <WidgetProvider>
-            <GestureHandlerRootView>
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="index" />
-                <Stack.Screen name="waitlist" />
-                <Stack.Screen name="auth" />
-                <Stack.Screen name="(tabs)" />
-                <Stack.Screen
-                  name="modal"
-                  options={{
-                    presentation: "modal",
-                    title: "Standard Modal",
-                  }}
-                />
-                <Stack.Screen
-                  name="formsheet"
-                  options={{
-                    presentation: "formSheet",
-                    title: "Form Sheet Modal",
-                    sheetGrabberVisible: true,
-                    sheetAllowedDetents: [0.5, 0.8, 1.0],
-                    sheetCornerRadius: 20,
-                  }}
-                />
-                <Stack.Screen
-                  name="transparent-modal"
-                  options={{
-                    presentation: "transparentModal",
-                    headerShown: false,
-                  }}
-                />
-              </Stack>
-              <SystemBars style={"auto"} />
-            </GestureHandlerRootView>
-          </WidgetProvider>
-        </AuthProvider>
+        <WidgetProvider>
+          <GestureHandlerRootView>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+              }}
+            >
+              {/* Waitlist flow */}
+              <Stack.Screen name="waitlist" />
+
+              {/* Main app with tabs */}
+              <Stack.Screen name="(tabs)" />
+
+              {/* Modal Demo Screens */}
+              <Stack.Screen
+                name="modal"
+                options={{
+                  presentation: "modal",
+                  title: "Standard Modal",
+                }}
+              />
+              <Stack.Screen
+                name="formsheet"
+                options={{
+                  presentation: "formSheet",
+                  title: "Form Sheet Modal",
+                  sheetGrabberVisible: true,
+                  sheetAllowedDetents: [0.5, 0.8, 1.0],
+                  sheetCornerRadius: 20,
+                }}
+              />
+              <Stack.Screen
+                name="transparent-modal"
+                options={{
+                  presentation: "transparentModal",
+                  headerShown: false,
+                }}
+              />
+            </Stack>
+            <SystemBars style={"light"} />
+          </GestureHandlerRootView>
+        </WidgetProvider>
       </ThemeProvider>
     </>
   );

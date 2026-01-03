@@ -4,91 +4,116 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { IconSymbol } from '@/components/IconSymbol';
 
 export default function ConfirmationScreen() {
   const router = useRouter();
 
   return (
-    <LinearGradient
-      colors={['#1a1a2e', '#16213e', '#0f3460']}
-      style={styles.container}
-    >
-      <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.container}>
+      <LinearGradient colors={['#1a1a1a', '#000000']} style={styles.gradient}>
         <View style={styles.content}>
           <View style={styles.iconContainer}>
-            <Text style={styles.icon}>✓</Text>
+            <IconSymbol 
+              ios_icon_name="checkmark.circle.fill" 
+              android_material_icon_name="check-circle" 
+              size={80} 
+              color="#4CAF50" 
+            />
           </View>
-          
-          <Text style={styles.title}>Application Submitted!</Text>
-          
+
+          <Text style={styles.title}>You&apos;re on the list!</Text>
           <Text style={styles.message}>
-            Thank you for your interest in Intentional. We'll review your application and get back to you soon.
+            Thank you for applying to Intentional. We&apos;ll review your application and
+            get back to you soon.
           </Text>
+
+          <View style={styles.infoBox}>
+            <Text style={styles.infoTitle}>What happens next?</Text>
+            <Text style={styles.infoText}>
+              • Our team will review your application{'\n'}
+              • You&apos;ll receive an email within 3-5 business days{'\n'}
+              • Once approved, you&apos;ll get access to the app
+            </Text>
+          </View>
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.replace('/auth/sign-in')}
+            onPress={() => router.replace('/waitlist/sign-in')}
           >
             <Text style={styles.buttonText}>Done</Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
-    </LinearGradient>
+      </LinearGradient>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#000',
   },
-  safeArea: {
+  gradient: {
     flex: 1,
   },
   content: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 32,
   },
   iconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 32,
-  },
-  icon: {
-    fontSize: 60,
-    color: '#FFFFFF',
-    fontWeight: '700',
+    marginBottom: 30,
   },
   title: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#fff',
     marginBottom: 16,
     textAlign: 'center',
   },
   message: {
-    fontSize: 16,
-    color: '#E0E0E0',
+    fontSize: 17,
+    color: '#999',
     textAlign: 'center',
     lineHeight: 24,
-    marginBottom: 48,
+    marginBottom: 40,
   },
-  button: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 16,
-    paddingHorizontal: 48,
-    borderRadius: 30,
-    minWidth: 200,
-    alignItems: 'center',
+  infoBox: {
+    backgroundColor: '#1a1a1a',
+    borderWidth: 1,
+    borderColor: '#333',
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+    marginBottom: 40,
   },
-  buttonText: {
+  infoTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1a1a2e',
+    color: '#fff',
+    marginBottom: 12,
+  },
+  infoText: {
+    fontSize: 15,
+    color: '#999',
+    lineHeight: 24,
+  },
+  button: {
+    backgroundColor: '#fff',
+    paddingVertical: 16,
+    paddingHorizontal: 60,
+    borderRadius: 30,
+    shadowColor: '#fff',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  buttonText: {
+    color: '#000',
+    fontSize: 17,
+    fontWeight: '600',
   },
 });
