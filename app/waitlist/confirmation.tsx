@@ -1,15 +1,15 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Image,
+  TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ConfirmationScreen() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function ConfirmationScreen() {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
           <Image
-            source={require('@/assets/images/logo.png')}
+            source={require('@/assets/images/final_quest_240x240.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -27,9 +27,8 @@ export default function ConfirmationScreen() {
           <Text style={styles.title}>Application Received!</Text>
 
           <Text style={styles.message}>
-            Your application has been successfully received and you are now on
-            our waitlist. We will contact you when your application has been
-            approved.
+            Your application has been successfully received and you are now in our
+            waitlist. We will contact you when your application has been approved.
           </Text>
 
           <TouchableOpacity
@@ -53,9 +52,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 32,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 32,
   },
   logo: {
     width: 120,
@@ -64,7 +63,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 24,
     textAlign: 'center',
@@ -75,18 +74,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 48,
-    paddingHorizontal: 16,
   },
   button: {
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 48,
     paddingVertical: 16,
+    paddingHorizontal: 48,
     borderRadius: 30,
     alignItems: 'center',
   },
   buttonText: {
-    color: '#000000',
     fontSize: 18,
     fontWeight: '600',
+    color: '#000000',
   },
 });
