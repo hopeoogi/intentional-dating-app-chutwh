@@ -1,7 +1,7 @@
 
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
 import React from 'react';
+import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   View,
   Text,
@@ -19,29 +19,26 @@ export default function SignInScreen() {
 
   return (
     <ImageBackground
-      source={require('@/assets/images/natively-dark.png')}
+      source={require('@/assets/images/background.png')}
       style={styles.background}
       resizeMode="cover"
     >
       <SafeAreaView style={styles.container}>
         <View style={styles.content}>
           <Image
-            source={require('@/assets/images/final_quest_240x240.png')}
+            source={require('@/assets/images/intentional-logo.png')}
             style={styles.logo}
             resizeMode="contain"
           />
-          
-          <Text style={styles.title}>Intentional Dating</Text>
-          <Text style={styles.subtitle}>
-            Where meaningful connections begin with conversation
-          </Text>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => router.push('/waitlist/application')}
-          >
-            <Text style={styles.buttonText}>Join Waitlist</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => router.push('/waitlist/application')}
+            >
+              <Text style={styles.buttonText}>Join Waitlist</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </SafeAreaView>
     </ImageBackground>
@@ -56,44 +53,31 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   content: {
+    flex: 1,
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 32,
-    width: '100%',
+    paddingVertical: 60,
   },
   logo: {
-    width: 120,
+    width: width * 0.6,
     height: 120,
-    marginBottom: 24,
+    marginTop: 40,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    opacity: 0.9,
-    textAlign: 'center',
-    marginBottom: 48,
-    paddingHorizontal: 20,
+  buttonContainer: {
+    width: '100%',
+    paddingHorizontal: 40,
+    marginBottom: 40,
   },
   button: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#000',
     paddingVertical: 16,
-    paddingHorizontal: 48,
     borderRadius: 30,
-    width: width * 0.7,
     alignItems: 'center',
   },
   buttonText: {
-    color: '#000000',
+    color: '#FFF',
     fontSize: 18,
     fontWeight: '600',
   },
