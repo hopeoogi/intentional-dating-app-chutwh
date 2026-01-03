@@ -1,45 +1,44 @@
 
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect } from 'react';
 import { useRouter } from 'expo-router';
-import { IconSymbol } from '@/components/IconSymbol';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ConfirmationScreen() {
   const router = useRouter();
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <LinearGradient
-        colors={['#1a1a1a', '#0a0a0a']}
-        style={styles.gradient}
-      >
+      <LinearGradient colors={['#1a1a2e', '#16213e']} style={styles.gradient}>
         <View style={styles.content}>
-          <View style={styles.iconContainer}>
-            <IconSymbol 
-              ios_icon_name="checkmark.circle.fill" 
-              android_material_icon_name="check-circle" 
-              size={80} 
-              color="#4CAF50" 
-            />
+          <Image
+            source={require('@/assets/images/9d78a159-4b83-473c-a4f1-55affbc6fcf0.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+
+          <View style={styles.checkmarkContainer}>
+            <Text style={styles.checkmark}>✓</Text>
           </View>
 
-          <Text style={styles.title}>You&apos;re on the list!</Text>
-          
-          <Text style={styles.message}>
-            Thank you for applying to join our exclusive community of intentional connections.
-          </Text>
+          <Text style={styles.title}>Application Received!</Text>
 
-          <Text style={styles.submessage}>
-            We&apos;ll review your application and get back to you soon via email.
+          <Text style={styles.message}>
+            Your application has been successfully received and you are now in our waitlist. We will contact you when your application has been approved.
           </Text>
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.replace('/')}
+            onPress={() => router.replace('/auth/sign-in')}
           >
-            <Text style={styles.buttonText}>Done</Text>
+            <Text style={styles.buttonText}>Return to Sign In</Text>
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -50,7 +49,7 @@ export default function ConfirmationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#1a1a2e',
   },
   gradient: {
     flex: 1,
@@ -59,34 +58,45 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: 32,
   },
-  iconContainer: {
+  logo: {
+    width: 100,
+    height: 100,
     marginBottom: 32,
   },
+  checkmarkContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+    borderWidth: 3,
+    borderColor: '#4CAF50',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  checkmark: {
+    fontSize: 48,
+    color: '#4CAF50',
+    fontWeight: 'bold',
+  },
   title: {
-    fontSize: 32,
-    fontWeight: '700',
+    fontSize: 28,
+    fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 16,
     textAlign: 'center',
+    marginBottom: 16,
   },
   message: {
-    fontSize: 18,
-    color: '#ccc',
-    textAlign: 'center',
-    marginBottom: 12,
-    lineHeight: 26,
-  },
-  submessage: {
     fontSize: 16,
-    color: '#999',
+    color: '#aaa',
     textAlign: 'center',
-    marginBottom: 48,
     lineHeight: 24,
+    marginBottom: 48,
   },
   button: {
-    backgroundColor: '#fff',
+    backgroundColor: '#e94560',
     borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 48,
@@ -95,7 +105,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#000',
+    fontWeight: 'bold',
+    color: '#fff',
   },
 });
