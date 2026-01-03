@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { View, Image, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -10,54 +10,65 @@ export default function WelcomeScreen() {
   const router = useRouter();
 
   useEffect(() => {
-    console.log('[Welcome] Screen mounted, will navigate in 3 seconds');
     const timer = setTimeout(() => {
-      console.log('[Welcome] Navigating to sign-in');
       router.replace('/auth/sign-in');
     }, 3000);
 
-    return () => {
-      console.log('[Welcome] Cleaning up timer');
-      clearTimeout(timer);
-    };
+    return () => clearTimeout(timer);
   }, []);
 
   return (
-    <LinearGradient
-      colors={['#1a1a1a', '#000000']}
-      style={styles.container}
-    >
+    <View style={styles.container}>
+      <Image
+        source={require('@/assets/images/27d3b11a-a9a5-4cb0-b6d1-8f0bdab61047.jpeg')}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      />
+      <LinearGradient
+        colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.6)']}
+        style={styles.overlay}
+      />
       <View style={styles.content}>
         <Image
-          source={require('../assets/images/natively-dark.png')}
+          source={require('@/assets/images/fe27da58-f92e-44ef-87bb-ba6254bd415c.png')}
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.appName}>Intentional</Text>
+        <Text style={styles.title}>Intentional</Text>
       </View>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#000',
+  },
+  backgroundImage: {
+    position: 'absolute',
+    width: width,
+    height: height,
+  },
+  overlay: {
+    position: 'absolute',
+    width: width,
+    height: height,
   },
   content: {
-    alignItems: 'center',
+    flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   logo: {
-    width: width * 0.6,
-    height: height * 0.3,
+    width: 120,
+    height: 120,
     marginBottom: 20,
   },
-  appName: {
-    fontSize: 48,
-    fontWeight: '300',
-    color: '#FFFFFF',
-    letterSpacing: 2,
+  title: {
+    fontSize: 42,
+    fontWeight: '600',
+    color: '#fff',
+    letterSpacing: 1,
   },
 });
