@@ -9,22 +9,29 @@ export default function ConfirmationScreen() {
   const router = useRouter();
 
   return (
-    <LinearGradient colors={['#1a1a1a', '#2d2d2d', '#1a1a1a']} style={styles.container}>
+    <LinearGradient colors={['#1a1a1a', '#2d2d2d']} style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
           <Image
-            source={require('@/assets/images/a5c86ed3-6460-4f6d-a333-47f2974b9f7d.png')}
+            source={require('@/assets/images/77b22b19-c746-4e98-8d29-016843ab4dd1.png')}
             style={styles.logo}
             resizeMode="contain"
           />
 
-          <Text style={styles.title}>Application Received!</Text>
+          <Text style={styles.title}>You're on the list!</Text>
           <Text style={styles.message}>
-            Thank you for your interest in Intentional. We'll review your application and get back
-            to you soon.
+            Thank you for joining our waitlist. We're building something special
+            and can't wait to have you as part of our community.
+          </Text>
+          <Text style={styles.submessage}>
+            We'll reach out soon with updates and next steps.
           </Text>
 
-          <TouchableOpacity style={styles.button} onPress={() => router.replace('/waitlist/sign-in')}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => router.replace('/')}
+            activeOpacity={0.8}
+          >
             <Text style={styles.buttonText}>Done</Text>
           </TouchableOpacity>
         </View>
@@ -42,39 +49,50 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 40,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 120,
+    height: 120,
     marginBottom: 40,
   },
   title: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: '300',
-    color: '#ffffff',
-    marginBottom: 16,
+    color: '#FFFFFF',
+    marginBottom: 24,
     textAlign: 'center',
-    letterSpacing: 0.5,
+    letterSpacing: 1,
   },
   message: {
-    fontSize: 16,
-    color: '#999999',
+    fontSize: 18,
+    color: '#CCCCCC',
     textAlign: 'center',
-    marginBottom: 40,
-    lineHeight: 24,
+    lineHeight: 26,
+    marginBottom: 16,
+  },
+  submessage: {
+    fontSize: 16,
+    color: '#999',
+    textAlign: 'center',
+    marginBottom: 48,
   },
   button: {
-    backgroundColor: '#ffffff',
-    paddingVertical: 16,
-    paddingHorizontal: 60,
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 18,
+    paddingHorizontal: 64,
     borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
   buttonText: {
     color: '#1a1a1a',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
     letterSpacing: 0.5,
   },

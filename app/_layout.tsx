@@ -2,7 +2,7 @@
 import "react-native-reanimated";
 import React, { useEffect } from "react";
 import { useFonts } from "expo-font";
-import { Stack, router } from "expo-router";
+import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { SystemBars } from "react-native-edge-to-edge";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -16,13 +16,11 @@ import {
 } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { WidgetProvider } from "@/contexts/WidgetContext";
-import { isBackendConfigured } from "@/utils/api";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
-  initialRouteName: "waitlist/welcome",
+  initialRouteName: "index",
 };
 
 export default function RootLayout() {
@@ -35,13 +33,6 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
-      
-      // Check backend configuration on startup
-      if (!isBackendConfigured()) {
-        console.warn('[App] Backend URL not configured');
-      } else {
-        console.log('[App] Backend configured and ready');
-      }
     }
   }, [loaded]);
 
@@ -52,7 +43,7 @@ export default function RootLayout() {
     ) {
       Alert.alert(
         "🔌 You are offline",
-        "Please connect to the internet to use Intentional."
+        "You can keep using the app! Your changes will be saved locally and synced when you are back online."
       );
     }
   }, [networkState.isConnected, networkState.isInternetReachable]);
@@ -94,42 +85,11 @@ export default function RootLayout() {
       >
         <WidgetProvider>
           <GestureHandlerRootView>
-            <Stack
-              screenOptions={{
-                headerShown: false,
-              }}
-            >
-              {/* Waitlist flow */}
-              <Stack.Screen name="waitlist" />
-
-              {/* Main app with tabs */}
-              <Stack.Screen name="(tabs)" />
-
-              {/* Modal Demo Screens */}
-              <Stack.Screen
-                name="modal"
-                options={{
-                  presentation: "modal",
-                  title: "Standard Modal",
-                }}
-              />
-              <Stack.Screen
-                name="formsheet"
-                options={{
-                  presentation: "formSheet",
-                  title: "Form Sheet Modal",
-                  sheetGrabberVisible: true,
-                  sheetAllowedDetents: [0.5, 0.8, 1.0],
-                  sheetCornerRadius: 20,
-                }}
-              />
-              <Stack.Screen
-                name="transparent-modal"
-                options={{
-                  presentation: "transparentModal",
-                  headerShown: false,
-                }}
-              />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="waitlist/sign-in" />
+              <Stack.Screen name="waitlist/application" />
+              <Stack.Screen name="waitlist/confirmation" />
             </Stack>
             <SystemBars style={"light"} />
           </GestureHandlerRootView>
