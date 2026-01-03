@@ -1,31 +1,35 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { IconSymbol } from '@/components/IconSymbol';
 
 export default function ConfirmationScreen() {
   const router = useRouter();
 
   return (
-    <LinearGradient colors={['#1a1a1a', '#000000']} style={styles.container}>
+    <LinearGradient colors={['#000000', '#1a1a1a']} style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
           <View style={styles.iconContainer}>
-            <IconSymbol 
-              ios_icon_name="checkmark.circle.fill" 
-              android_material_icon_name="check-circle" 
-              size={80} 
-              color="#FFFFFF" 
+            <IconSymbol
+              ios_icon_name="checkmark.circle.fill"
+              android_material_icon_name="check-circle"
+              size={80}
+              color="#4CAF50"
             />
           </View>
 
-          <Text style={styles.title}>Application Received</Text>
+          <Text style={styles.title}>Application Submitted!</Text>
           
           <Text style={styles.message}>
-            Your application is being processed and you are on the waitlist. Please be patient, we will contact you when your application is approved.
+            Thank you for your interest in Intentional. We're reviewing your application and will get back to you soon.
+          </Text>
+
+          <Text style={styles.subMessage}>
+            Keep an eye on your email for updates about your application status.
           </Text>
 
           <TouchableOpacity
@@ -51,40 +55,43 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: 32,
   },
   iconContainer: {
-    marginBottom: 30,
+    marginBottom: 32,
   },
   title: {
     fontSize: 32,
-    fontWeight: '300',
+    fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 20,
-    letterSpacing: 0.5,
+    marginBottom: 16,
+    textAlign: 'center',
   },
   message: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#CCCCCC',
     textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 50,
+    lineHeight: 26,
+    marginBottom: 16,
+  },
+  subMessage: {
+    fontSize: 14,
+    color: '#999999',
+    textAlign: 'center',
+    marginBottom: 48,
   },
   button: {
     backgroundColor: '#FFFFFF',
+    paddingHorizontal: 48,
     paddingVertical: 16,
-    paddingHorizontal: 60,
     borderRadius: 30,
-    shadowColor: '#FFFFFF',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    width: '100%',
+    maxWidth: 300,
   },
   buttonText: {
-    color: '#000000',
     fontSize: 18,
     fontWeight: '600',
-    letterSpacing: 0.5,
+    color: '#000000',
+    textAlign: 'center',
   },
 });

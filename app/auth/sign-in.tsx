@@ -1,21 +1,28 @@
 
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-
-const { width } = Dimensions.get('window');
 
 export default function SignInScreen() {
   const router = useRouter();
 
   return (
-    <LinearGradient colors={['#1a1a1a', '#000']} style={styles.container}>
+    <LinearGradient
+      colors={['#000000', '#1a1a1a']}
+      style={styles.container}
+    >
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
           <Image
-            source={require('@/assets/images/fe27da58-f92e-44ef-87bb-ba6254bd415c.png')}
+            source={require('@/assets/images/natively-dark.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -49,43 +56,39 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: 32,
   },
   logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
+    width: 120,
+    height: 120,
+    marginBottom: 24,
   },
   title: {
-    fontSize: 38,
-    fontWeight: '600',
-    color: '#fff',
-    marginBottom: 30,
+    fontSize: 42,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 24,
     letterSpacing: 1,
   },
   description: {
     fontSize: 16,
-    color: '#ccc',
+    color: '#CCCCCC',
     textAlign: 'center',
     lineHeight: 24,
-    marginBottom: 50,
-    maxWidth: width - 80,
+    marginBottom: 48,
   },
   button: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 48,
     paddingVertical: 16,
-    paddingHorizontal: 60,
     borderRadius: 30,
-    shadowColor: '#fff',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    width: '100%',
+    maxWidth: 300,
   },
   buttonText: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: '600',
-    color: '#000',
-    letterSpacing: 0.5,
+    color: '#000000',
+    textAlign: 'center',
   },
 });
