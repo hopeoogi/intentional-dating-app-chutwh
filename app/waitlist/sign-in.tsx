@@ -1,4 +1,6 @@
 
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import {
   View,
@@ -8,11 +10,7 @@ import {
   ImageBackground,
   Image,
   Dimensions,
-  Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 
@@ -21,47 +19,31 @@ export default function SignInScreen() {
 
   return (
     <ImageBackground
-      source={require('@/assets/images/e7e6a9b0-ce72-4ec9-8988-7531775db60c.jpeg')}
+      source={require('@/assets/images/natively-dark.png')}
       style={styles.background}
       resizeMode="cover"
     >
-      <LinearGradient
-        colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.7)']}
-        style={styles.overlay}
-      >
-        <SafeAreaView style={styles.container}>
-          <View style={styles.content}>
-            {/* Logo */}
-            <Image
-              source={require('@/assets/images/260cc1c3-9577-4d6b-bb49-5785013cf9ac.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
+      <SafeAreaView style={styles.container}>
+        <View style={styles.content}>
+          <Image
+            source={require('@/assets/images/final_quest_240x240.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          
+          <Text style={styles.title}>Intentional Dating</Text>
+          <Text style={styles.subtitle}>
+            Where meaningful connections begin with conversation
+          </Text>
 
-            {/* Title */}
-            <Text style={styles.title}>Intentional</Text>
-
-            {/* Subtitle */}
-            <Text style={styles.subtitle}>
-              Dating with purpose.{'\n'}Real connections, no games.
-            </Text>
-
-            {/* CTA Button */}
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => router.push('/waitlist/application')}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.buttonText}>Join the Waitlist</Text>
-            </TouchableOpacity>
-
-            {/* Footer */}
-            <Text style={styles.footer}>
-              Be part of a verified community that values{'\n'}meaningful conversations
-            </Text>
-          </View>
-        </SafeAreaView>
-      </LinearGradient>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => router.push('/waitlist/application')}
+          >
+            <Text style={styles.buttonText}>Join Waitlist</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     </ImageBackground>
   );
 }
@@ -72,17 +54,15 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  overlay: {
-    flex: 1,
-  },
   container: {
-    flex: 1,
-  },
-  content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  content: {
+    alignItems: 'center',
     paddingHorizontal: 32,
+    width: '100%',
   },
   logo: {
     width: 120,
@@ -90,49 +70,31 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    fontSize: 48,
-    fontWeight: '300',
+    fontSize: 32,
+    fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 16,
-    letterSpacing: 1,
+    marginBottom: 12,
+    textAlign: 'center',
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#FFFFFF',
+    opacity: 0.9,
     textAlign: 'center',
     marginBottom: 48,
-    opacity: 0.9,
-    lineHeight: 26,
+    paddingHorizontal: 20,
   },
   button: {
     backgroundColor: '#FFFFFF',
     paddingVertical: 16,
     paddingHorizontal: 48,
     borderRadius: 30,
-    marginBottom: 32,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+    width: width * 0.7,
+    alignItems: 'center',
   },
   buttonText: {
+    color: '#000000',
     fontSize: 18,
     fontWeight: '600',
-    color: '#000000',
-    letterSpacing: 0.5,
-  },
-  footer: {
-    fontSize: 14,
-    color: '#FFFFFF',
-    textAlign: 'center',
-    opacity: 0.7,
-    lineHeight: 20,
   },
 });

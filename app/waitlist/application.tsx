@@ -141,7 +141,11 @@ export default function ApplicationScreen() {
       }
 
       console.log('Application submitted successfully:', data);
-      router.push('/waitlist/confirmation');
+      
+      // Navigate to confirmation screen
+      console.log('Navigating to confirmation screen...');
+      router.replace('/waitlist/confirmation');
+      
     } catch (error: any) {
       console.error('Application submission error:', error);
       console.error('Error details:', {
@@ -173,7 +177,7 @@ export default function ApplicationScreen() {
           {/* Header */}
           <View style={styles.header}>
             <Image
-              source={require('@/assets/images/260cc1c3-9577-4d6b-bb49-5785013cf9ac.png')}
+              source={require('@/assets/images/final_quest_240x240.png')}
               style={styles.logo}
               resizeMode="contain"
             />
