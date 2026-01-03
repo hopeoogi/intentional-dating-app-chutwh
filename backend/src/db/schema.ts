@@ -122,7 +122,7 @@ export const waitlistApplications = pgTable('waitlist_applications', {
   location: text('location').notNull(),
   email: text('email').notNull().unique(),
   phone: text('phone'),
-  lookingFor: text('looking_for').notNull(),
+  lookingFor: jsonb('looking_for').$type<string[]>().notNull(),
   additionalInfo: text('additional_info'),
   status: waitlistStatusEnum('status').default('pending').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),

@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import * as schema from '../db/schema.js';
 import type { App } from '../index.js';
@@ -10,8 +10,12 @@ interface WaitlistApplicationRequest {
   location: string;
   email: string;
   phone?: string;
-  lookingFor: string;
+  lookingFor: string[];
   additionalInfo?: string;
+}
+
+interface UpdateStatusRequest {
+  status: string;
 }
 
 // Email validation regex
@@ -27,7 +31,7 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
   ): Promise<any | void> => {
     const body = request.body as WaitlistApplicationRequest;
 
-    // Validate required fields
+    // Validate name
     if (!body.name || typeof body.name !== 'string' || body.name.trim() === '') {
       return reply.status(400).send({
         error: 'Validation error',
@@ -36,6 +40,7 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
       });
     }
 
+    // Validate age
     if (body.age === undefined || typeof body.age !== 'number') {
       return reply.status(400).send({
         error: 'Validation error',
@@ -44,14 +49,15 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
       });
     }
 
-    if (body.age < 18) {
+    if (!Number.isInteger(body.age) || body.age < 18) {
       return reply.status(400).send({
         error: 'Validation error',
         field: 'age',
-        message: 'Age must be 18 or older',
+        message: 'Age must be at least 18 years old',
       });
     }
 
+    // Validate location
     if (!body.location || typeof body.location !== 'string' || body.location.trim() === '') {
       return reply.status(400).send({
         error: 'Validation error',
@@ -60,6 +66,7 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
       });
     }
 
+    // Validate email
     if (!body.email || typeof body.email !== 'string' || !EMAIL_REGEX.test(body.email)) {
       return reply.status(400).send({
         error: 'Validation error',
@@ -68,11 +75,21 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
       });
     }
 
-    if (!body.lookingFor || typeof body.lookingFor !== 'string' || body.lookingFor.trim() === '') {
+    // Validate lookingFor (must be array with at least 1 item)
+    if (!Array.isArray(body.lookingFor) || body.lookingFor.length === 0) {
       return reply.status(400).send({
         error: 'Validation error',
         field: 'lookingFor',
-        message: 'lookingFor is required and must be a non-empty string',
+        message: 'lookingFor is required and must be an array with at least 1 item',
+      });
+    }
+
+    // Validate all items in lookingFor are strings
+    if (!body.lookingFor.every((item) => typeof item === 'string' && item.trim() !== '')) {
+      return reply.status(400).send({
+        error: 'Validation error',
+        field: 'lookingFor',
+        message: 'All items in lookingFor must be non-empty strings',
       });
     }
 
@@ -105,7 +122,7 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
           location: body.location.trim(),
           email: body.email.toLowerCase().trim(),
           phone: body.phone?.trim(),
-          lookingFor: body.lookingFor.trim(),
+          lookingFor: body.lookingFor.map((item) => item.trim()),
           additionalInfo: body.additionalInfo?.trim(),
           status: 'pending',
         })
@@ -114,8 +131,13 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
       return reply.status(201).send({
         success: true,
         message: 'Application submitted successfully',
-        applicationId: application.id,
-        status: application.status,
+        application: {
+          id: application.id,
+          name: application.name,
+          email: application.email,
+          status: application.status,
+          createdAt: application.createdAt,
+        },
       });
     } catch (err) {
       // Handle unique constraint violation on email
@@ -126,12 +148,13 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
           message: 'An application with this email already exists',
         });
       }
+      app.logger.error({ err }, 'Error creating waitlist application');
       throw err;
     }
   });
 
   // Protected admin GET endpoint for waitlist applications with pagination
-  fastify.get('/api/waitlist/applications', async (
+  fastify.get('/api/admin/waitlist', async (
     request: FastifyRequest,
     reply: FastifyReply
   ): Promise<any | void> => {
@@ -139,55 +162,51 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
     if (!session) return;
 
     const query = request.query as Record<string, string | undefined>;
-    const pageStr = query.page;
-    const limitStr = query.limit;
-    const status = query.status;
+    const statusFilter = query.status;
+    const limitStr = query.limit || '100';
+    const offsetStr = query.offset || '0';
 
-    const page = Math.max(1, parseInt(pageStr || '1'));
-    const limit = Math.min(Math.max(1, parseInt(limitStr || '20')), 100);
-    const offset = (page - 1) * limit;
+    const limit = Math.min(Math.max(1, parseInt(limitStr)), 200);
+    const offset = Math.max(0, parseInt(offsetStr));
 
     try {
       // Build where clause
       let whereClause: any = undefined;
-      if (status && ['pending', 'approved', 'rejected'].includes(status)) {
-        whereClause = eq(schema.waitlistApplications.status, status as 'pending' | 'approved' | 'rejected');
+      if (statusFilter && ['pending', 'approved', 'rejected'].includes(statusFilter)) {
+        whereClause = eq(schema.waitlistApplications.status, statusFilter as 'pending' | 'approved' | 'rejected');
       }
 
       // Get total count
-      const countResult = whereClause
-        ? await app.db
-            .select()
-            .from(schema.waitlistApplications)
-            .where(whereClause)
-        : await app.db.select().from(schema.waitlistApplications);
-
+      let countQuery = app.db.select().from(schema.waitlistApplications);
+      if (whereClause) {
+        countQuery = countQuery.where(whereClause) as any;
+      }
+      const countResult = await countQuery;
       const total = countResult.length;
 
-      // Get paginated results
-      let query_result = app.db
+      // Get paginated results, sorted by createdAt descending
+      let applicationsQuery = app.db
         .select()
         .from(schema.waitlistApplications)
+        .orderBy(desc(schema.waitlistApplications.createdAt))
         .limit(limit)
-        .offset(offset)
-        .orderBy((app) => app.createdAt);
+        .offset(offset);
 
       if (whereClause) {
-        query_result = query_result.where(whereClause) as any;
+        applicationsQuery = applicationsQuery.where(whereClause) as any;
       }
 
-      const applications = await query_result;
+      const applications = await applicationsQuery;
 
-      return {
+      return reply.status(200).send({
         success: true,
         pagination: {
-          page,
           limit,
+          offset,
           total,
-          totalPages: Math.ceil(total / limit),
         },
         applications,
-      };
+      });
     } catch (err) {
       app.logger.error({ err }, 'Error fetching waitlist applications');
       return reply.status(500).send({
@@ -197,8 +216,8 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
     }
   });
 
-  // Protected admin POST endpoint to update application status
-  fastify.post('/api/waitlist/applications/:id/status', async (
+  // Protected admin PATCH endpoint to update application status
+  fastify.patch('/api/admin/waitlist/:id', async (
     request: FastifyRequest,
     reply: FastifyReply
   ): Promise<any | void> => {
@@ -206,9 +225,10 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
     if (!session) return;
 
     const { id } = request.params as { id: string };
-    const { status } = request.body as { status: string };
+    const body = request.body as UpdateStatusRequest;
 
-    if (!status || !['pending', 'approved', 'rejected'].includes(status)) {
+    // Validate status
+    if (!body.status || !['pending', 'approved', 'rejected'].includes(body.status)) {
       return reply.status(400).send({
         error: 'Validation error',
         field: 'status',
@@ -216,27 +236,37 @@ export function registerWaitlistRoutes(app: App, fastify: FastifyInstance) {
       });
     }
 
-    const application = await app.db.query.waitlistApplications.findFirst({
-      where: eq(schema.waitlistApplications.id, id),
-    });
+    try {
+      // Check if application exists
+      const application = await app.db.query.waitlistApplications.findFirst({
+        where: eq(schema.waitlistApplications.id, id),
+      });
 
-    if (!application) {
-      return reply.status(404).send({
-        error: 'Not found',
-        message: 'Waitlist application not found',
+      if (!application) {
+        return reply.status(404).send({
+          error: 'Not found',
+          message: 'Waitlist application not found',
+        });
+      }
+
+      // Update status
+      const [updated] = await app.db
+        .update(schema.waitlistApplications)
+        .set({ status: body.status as 'pending' | 'approved' | 'rejected' })
+        .where(eq(schema.waitlistApplications.id, id))
+        .returning();
+
+      return reply.status(200).send({
+        success: true,
+        message: `Application status updated to ${body.status}`,
+        application: updated,
+      });
+    } catch (err) {
+      app.logger.error({ err }, 'Error updating waitlist application status');
+      return reply.status(500).send({
+        error: 'Internal server error',
+        message: 'Failed to update application status',
       });
     }
-
-    const [updated] = await app.db
-      .update(schema.waitlistApplications)
-      .set({ status: status as 'pending' | 'approved' | 'rejected' })
-      .where(eq(schema.waitlistApplications.id, id))
-      .returning();
-
-    return {
-      success: true,
-      message: `Application status updated to ${status}`,
-      application: updated,
-    };
   });
 }

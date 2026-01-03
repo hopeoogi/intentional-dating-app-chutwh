@@ -1,0 +1,2 @@
+-- This migration is skipped - the looking_for column conversion is handled in 20260103161211_fix_looking_for_jsonb.sql
+-- Leaving this file empty to preserve migration history
