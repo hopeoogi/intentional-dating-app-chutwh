@@ -1,44 +1,45 @@
 
-import React, { useEffect } from 'react';
-import { useRouter } from 'expo-router';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import { IconSymbol } from '@/components/IconSymbol';
 
 export default function ConfirmationScreen() {
   const router = useRouter();
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <LinearGradient colors={['#1a1a2e', '#16213e']} style={styles.gradient}>
+      <LinearGradient
+        colors={['#1a1a1a', '#0a0a0a']}
+        style={styles.gradient}
+      >
         <View style={styles.content}>
-          <Image
-            source={require('@/assets/images/9d78a159-4b83-473c-a4f1-55affbc6fcf0.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-
-          <View style={styles.checkmarkContainer}>
-            <Text style={styles.checkmark}>✓</Text>
+          <View style={styles.iconContainer}>
+            <IconSymbol 
+              ios_icon_name="checkmark.circle.fill" 
+              android_material_icon_name="check-circle" 
+              size={80} 
+              color="#4CAF50" 
+            />
           </View>
 
-          <Text style={styles.title}>Application Received!</Text>
-
+          <Text style={styles.title}>You&apos;re on the list!</Text>
+          
           <Text style={styles.message}>
-            Your application has been successfully received and you are now in our waitlist. We will contact you when your application has been approved.
+            Thank you for applying to join our exclusive community of intentional connections.
+          </Text>
+
+          <Text style={styles.submessage}>
+            We&apos;ll review your application and get back to you soon via email.
           </Text>
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.replace('/auth/sign-in')}
+            onPress={() => router.replace('/')}
           >
-            <Text style={styles.buttonText}>Return to Sign In</Text>
+            <Text style={styles.buttonText}>Done</Text>
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -49,7 +50,7 @@ export default function ConfirmationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#000',
   },
   gradient: {
     flex: 1,
@@ -58,45 +59,34 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 32,
+    padding: 24,
   },
-  logo: {
-    width: 100,
-    height: 100,
+  iconContainer: {
     marginBottom: 32,
-  },
-  checkmarkContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(76, 175, 80, 0.2)',
-    borderWidth: 3,
-    borderColor: '#4CAF50',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  checkmark: {
-    fontSize: 48,
-    color: '#4CAF50',
-    fontWeight: 'bold',
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 32,
+    fontWeight: '700',
     color: '#fff',
-    textAlign: 'center',
     marginBottom: 16,
+    textAlign: 'center',
   },
   message: {
-    fontSize: 16,
-    color: '#aaa',
+    fontSize: 18,
+    color: '#ccc',
     textAlign: 'center',
-    lineHeight: 24,
+    marginBottom: 12,
+    lineHeight: 26,
+  },
+  submessage: {
+    fontSize: 16,
+    color: '#999',
+    textAlign: 'center',
     marginBottom: 48,
+    lineHeight: 24,
   },
   button: {
-    backgroundColor: '#e94560',
+    backgroundColor: '#fff',
     borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 48,
@@ -105,7 +95,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: '700',
+    color: '#000',
   },
 });
