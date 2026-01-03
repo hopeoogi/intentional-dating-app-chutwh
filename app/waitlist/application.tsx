@@ -42,6 +42,8 @@ const RELATIONSHIP_GOALS = [
   'Building something real',
 ];
 
+const MAX_SELECTIONS = 5;
+
 export default function ApplicationScreen() {
   const router = useRouter();
   const [name, setName] = useState('');
@@ -55,9 +57,17 @@ export default function ApplicationScreen() {
 
   const toggleLookingFor = (option: string) => {
     if (lookingFor.includes(option)) {
+      // Allow deselecting
       setLookingFor(lookingFor.filter((item) => item !== option));
-    } else {
+    } else if (lookingFor.length < MAX_SELECTIONS) {
+      // Only allow selecting if under the limit
       setLookingFor([...lookingFor, option]);
+    } else {
+      // Show alert when trying to select more than 5
+      Alert.alert(
+        'Maximum Selections Reached',
+        `You can select up to ${MAX_SELECTIONS} relationship goals. Please deselect one to choose another.`
+      );
     }
   };
 
@@ -243,28 +253,43 @@ export default function ApplicationScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>What are you looking for? *</Text>
-                <Text style={styles.helperText}>Select all that apply</Text>
+                <View style={styles.labelRow}>
+                  <Text style={styles.label}>What are you looking for? *</Text>
+                  <Text style={styles.counter}>
+                    {lookingFor.length}/{MAX_SELECTIONS} selected
+                  </Text>
+                </View>
+                <Text style={styles.helperText}>
+                  Select up to {MAX_SELECTIONS} that resonate with you
+                </Text>
                 <View style={styles.optionsGrid}>
-                  {RELATIONSHIP_GOALS.map((option) => (
-                    <TouchableOpacity
-                      key={option}
-                      style={[
-                        styles.optionChip,
-                        lookingFor.includes(option) && styles.optionChipSelected,
-                      ]}
-                      onPress={() => toggleLookingFor(option)}
-                    >
-                      <Text
+                  {RELATIONSHIP_GOALS.map((option) => {
+                    const isSelected = lookingFor.includes(option);
+                    const isDisabled = !isSelected && lookingFor.length >= MAX_SELECTIONS;
+                    
+                    return (
+                      <TouchableOpacity
+                        key={option}
                         style={[
-                          styles.optionText,
-                          lookingFor.includes(option) && styles.optionTextSelected,
+                          styles.optionChip,
+                          isSelected && styles.optionChipSelected,
+                          isDisabled && styles.optionChipDisabled,
                         ]}
+                        onPress={() => toggleLookingFor(option)}
+                        disabled={isDisabled}
                       >
-                        {option}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                        <Text
+                          style={[
+                            styles.optionText,
+                            isSelected && styles.optionTextSelected,
+                            isDisabled && styles.optionTextDisabled,
+                          ]}
+                        >
+                          {option}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
               </View>
 
@@ -356,6 +381,21 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 8,
   },
+  labelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  counter: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
+    backgroundColor: '#333',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
   helperText: {
     fontSize: 14,
     color: '#666',
@@ -392,6 +432,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderColor: '#fff',
   },
+  optionChipDisabled: {
+    backgroundColor: '#0d0d0d',
+    borderColor: '#222',
+    opacity: 0.5,
+  },
   optionText: {
     fontSize: 14,
     color: '#999',
@@ -400,6 +445,9 @@ const styles = StyleSheet.create({
   optionTextSelected: {
     color: '#000',
     fontWeight: '600',
+  },
+  optionTextDisabled: {
+    color: '#555',
   },
   submitButton: {
     backgroundColor: '#fff',
