@@ -1,113 +1,39 @@
 
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ImageBackground,
-  Image,
-  Dimensions,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { colors } from '@/styles/commonStyles';
 
-const { width, height } = Dimensions.get('window');
-
-export default function SignInScreen() {
+export default function WaitlistSignInScreen() {
   const router = useRouter();
 
   return (
-    <ImageBackground
-      source={require('@/assets/images/d45a04a7-5fce-423f-af69-1e7c41804f69.jpeg')}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <LinearGradient
-        colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.7)']}
-        style={styles.overlay}
-      >
-        <SafeAreaView style={styles.container}>
-          <View style={styles.content}>
-            <Image
-              source={require('@/assets/images/260cc1c3-9577-4d6b-bb49-5785013cf9ac.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-            
-            <Text style={styles.description}>
-              Join our exclusive community of Intentional connections. No likes or swipes anymore, no more being ghosted, only genuine relationships
-            </Text>
-            
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.joinButton}
-                onPress={() => router.push('/waitlist/application')}
-              >
-                <Text style={styles.joinButtonText}>Join Waitlist</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </SafeAreaView>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <LinearGradient colors={['#000000', '#1a1a1a']} style={styles.gradient}>
+        <View style={styles.content}>
+          <Text style={styles.title}>Join the Waitlist</Text>
+          <Text style={styles.subtitle}>Be among the first to experience intentional dating</Text>
+          
+          <TouchableOpacity 
+            style={styles.button}
+            onPress={() => router.push('/waitlist/application')}
+          >
+            <Text style={styles.buttonText}>Get Started</Text>
+          </TouchableOpacity>
+        </View>
       </LinearGradient>
-    </ImageBackground>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  overlay: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 24,
-  },
-  logo: {
-    width: width * 0.6,
-    height: 120,
-    marginTop: 40,
-  },
-  description: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '400',
-    textAlign: 'center',
-    lineHeight: 24,
-    paddingHorizontal: 20,
-    marginTop: -80,
-    letterSpacing: 0.3,
-  },
-  buttonContainer: {
-    width: '100%',
-    marginBottom: 40,
-  },
-  joinButton: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 16,
-    borderRadius: 30,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  joinButtonText: {
-    color: '#000000',
-    fontSize: 18,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-  },
+  container: { flex: 1, backgroundColor: '#000' },
+  gradient: { flex: 1 },
+  content: { flex: 1, justifyContent: 'center', padding: 24 },
+  title: { fontSize: 32, fontWeight: 'bold', color: '#fff', marginBottom: 12 },
+  subtitle: { fontSize: 16, color: '#999', marginBottom: 48 },
+  button: { backgroundColor: colors.primary, padding: 16, borderRadius: 12, alignItems: 'center' },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });
