@@ -1,33 +1,26 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import { colors } from '@/styles/commonStyles';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { IconSymbol } from '@/components/IconSymbol';
+import { colors } from '@/styles/commonStyles';
 
 export default function ConfirmationScreen() {
   const router = useRouter();
 
-  useEffect(() => {
-    console.log('[ConfirmationScreen] Screen mounted successfully');
-  }, []);
-
-  const handleBackToSignIn = () => {
-    console.log('[ConfirmationScreen] Navigating back to sign in');
-    router.replace('/auth/sign-in');
-  };
+  console.log('[ConfirmationScreen] Rendered');
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <LinearGradient
-        colors={[colors.background, colors.card]}
+        colors={[colors.background, colors.cardBackground]}
         style={styles.gradient}
       >
         <View style={styles.content}>
@@ -39,24 +32,20 @@ export default function ConfirmationScreen() {
               color={colors.primary} 
             />
           </View>
-
-          <Text style={styles.title}>You&apos;re on the Waitlist!</Text>
           
+          <Text style={styles.title}>Application Submitted!</Text>
           <Text style={styles.message}>
-            Thank you for applying to our intentional dating community. 
-            We&apos;ll review your application and notify you via email once you&apos;re approved.
-          </Text>
-
-          <Text style={styles.subMessage}>
-            We&apos;re building something special—a dating app focused on meaningful connections, 
-            not endless swiping.
+            Thank you for your interest. We&apos;ll review your application and get back to you soon.
           </Text>
 
           <TouchableOpacity
             style={styles.button}
-            onPress={handleBackToSignIn}
+            onPress={() => {
+              console.log('[ConfirmationScreen] Navigating back to sign-in');
+              router.replace('/waitlist/sign-in');
+            }}
           >
-            <Text style={styles.buttonText}>Back to Sign In</Text>
+            <Text style={styles.buttonText}>Return to Sign In</Text>
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -82,7 +71,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
     color: colors.text,
     marginBottom: 16,
@@ -92,24 +81,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.textSecondary,
     textAlign: 'center',
-    marginBottom: 16,
     lineHeight: 24,
-  },
-  subMessage: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
     marginBottom: 48,
-    lineHeight: 22,
-    fontStyle: 'italic',
   },
   button: {
     backgroundColor: colors.primary,
     paddingVertical: 16,
     paddingHorizontal: 48,
     borderRadius: 12,
-    width: '100%',
-    maxWidth: 300,
+    minWidth: 200,
   },
   buttonText: {
     color: '#FFFFFF',
