@@ -1,111 +1,129 @@
 
-import React, { useEffect } from 'react';
-import { useRouter } from 'expo-router';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  Image,
   TouchableOpacity,
+  Image,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function ConfirmationScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <LinearGradient colors={['#1a1a2e', '#16213e']} style={styles.gradient}>
+    <LinearGradient colors={['#000000', '#1A1A1A']} style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
+          {/* Success Icon */}
+          <View style={styles.iconContainer}>
+            <View style={styles.checkCircle}>
+              <Text style={styles.checkMark}>✓</Text>
+            </View>
+          </View>
+
+          {/* Logo */}
           <Image
-            source={require('@/assets/images/9d78a159-4b83-473c-a4f1-55affbc6fcf0.png')}
+            source={require('@/assets/images/260cc1c3-9577-4d6b-bb49-5785013cf9ac.png')}
             style={styles.logo}
             resizeMode="contain"
           />
 
-          <View style={styles.checkmarkContainer}>
-            <Text style={styles.checkmark}>✓</Text>
-          </View>
+          {/* Title */}
+          <Text style={styles.title}>You're on the list!</Text>
 
-          <Text style={styles.title}>Application Received!</Text>
-
+          {/* Message */}
           <Text style={styles.message}>
-            Your application has been successfully received and you are now in our waitlist. We will contact you when your application has been approved.
+            Thank you for applying to Intentional. We're reviewing your application and will notify you via email once you've been approved.
           </Text>
 
+          <Text style={styles.subMessage}>
+            We're building a verified community of people who value meaningful connections. You'll hear from us soon.
+          </Text>
+
+          {/* Button */}
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.replace('/auth/sign-in')}
+            onPress={() => router.push('/waitlist/sign-in')}
+            activeOpacity={0.8}
           >
-            <Text style={styles.buttonText}>Return to Sign In</Text>
+            <Text style={styles.buttonText}>Done</Text>
           </TouchableOpacity>
         </View>
-      </LinearGradient>
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
   },
-  gradient: {
+  safeArea: {
     flex: 1,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 32,
+    paddingHorizontal: 32,
+  },
+  iconContainer: {
+    marginBottom: 32,
+  },
+  checkCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkMark: {
+    fontSize: 48,
+    color: '#000000',
+    fontWeight: 'bold',
   },
   logo: {
     width: 100,
     height: 100,
-    marginBottom: 32,
-  },
-  checkmarkContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(76, 175, 80, 0.2)',
-    borderWidth: 3,
-    borderColor: '#4CAF50',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  checkmark: {
-    fontSize: 48,
-    color: '#4CAF50',
-    fontWeight: 'bold',
+    marginBottom: 24,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 16,
+    fontSize: 36,
+    fontWeight: '300',
+    color: '#FFFFFF',
+    marginBottom: 24,
+    letterSpacing: 0.5,
   },
   message: {
+    fontSize: 18,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    lineHeight: 26,
+    marginBottom: 20,
+    opacity: 0.9,
+  },
+  subMessage: {
     fontSize: 16,
-    color: '#aaa',
+    color: '#999999',
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 48,
   },
   button: {
-    backgroundColor: '#e94560',
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
     paddingVertical: 16,
-    paddingHorizontal: 48,
-    minWidth: 200,
-    alignItems: 'center',
+    paddingHorizontal: 64,
+    borderRadius: 30,
   },
   buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#000000',
+    letterSpacing: 0.5,
   },
 });
