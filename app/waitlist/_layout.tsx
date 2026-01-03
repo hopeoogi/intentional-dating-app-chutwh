@@ -6,9 +6,11 @@ export default function WaitlistLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        animation: 'slide_from_right',
+        animation: 'fade',
       }}
     >
+      <Stack.Screen name="welcome" />
+      <Stack.Screen name="sign-in" />
       <Stack.Screen name="application" />
       <Stack.Screen name="confirmation" />
     </Stack>

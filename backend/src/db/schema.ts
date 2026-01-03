@@ -117,12 +117,9 @@ export const conversationActions = pgTable('conversation_actions', {
 // Waitlist applications table
 export const waitlistApplications = pgTable('waitlist_applications', {
   id: text('id').primaryKey(),
-  firstName: text('first_name').notNull(),
-  lastName: text('last_name').notNull(),
+  name: text('name').notNull(),
   age: integer('age').notNull(),
-  city: text('city').notNull(),
-  provinceState: text('province_state').notNull(),
-  country: text('country').notNull(),
+  location: text('location').notNull(),
   email: text('email').notNull().unique(),
   phone: text('phone'),
   lookingFor: jsonb('looking_for').$type<string[]>().notNull(),
