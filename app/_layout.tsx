@@ -21,7 +21,7 @@ import { WidgetProvider } from "@/contexts/WidgetContext";
 SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
-  initialRouteName: "waitlist/welcome",
+  initialRouteName: "waitlist/sign-in", // Start with waitlist sign-in
 };
 
 export default function RootLayout() {
@@ -86,8 +86,25 @@ export default function RootLayout() {
           <WidgetProvider>
             <GestureHandlerRootView>
             <Stack>
-              {/* Waitlist flow */}
-              <Stack.Screen name="waitlist" options={{ headerShown: false }} />
+              {/* Waitlist Flow */}
+              <Stack.Screen 
+                name="waitlist/sign-in" 
+                options={{ headerShown: false }} 
+              />
+              <Stack.Screen 
+                name="waitlist/application" 
+                options={{ 
+                  headerShown: true,
+                  title: 'Application',
+                  headerStyle: { backgroundColor: '#000000' },
+                  headerTintColor: '#FFFFFF',
+                  headerBackTitle: 'Back',
+                }} 
+              />
+              <Stack.Screen 
+                name="waitlist/confirmation" 
+                options={{ headerShown: false }} 
+              />
 
               {/* Main app with tabs */}
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
