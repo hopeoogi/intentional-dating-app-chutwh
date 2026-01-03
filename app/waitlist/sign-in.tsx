@@ -1,107 +1,88 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
+  ImageBackground,
   Image,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export default function SignInScreen() {
   const router = useRouter();
 
   return (
-    <LinearGradient colors={['#1a1a1a', '#2d2d2d']} style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Logo */}
-          <View style={styles.logoContainer}>
+    <ImageBackground
+      source={require('@/assets/images/d45a04a7-5fce-423f-af69-1e7c41804f69.jpeg')}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <LinearGradient
+        colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.7)']}
+        style={styles.overlay}
+      >
+        <SafeAreaView style={styles.container}>
+          <View style={styles.content}>
             <Image
-              source={require('@/assets/images/77b22b19-c746-4e98-8d29-016843ab4dd1.png')}
+              source={require('@/assets/images/260cc1c3-9577-4d6b-bb49-5785013cf9ac.png')}
               style={styles.logo}
               resizeMode="contain"
             />
+            
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.joinButton}
+                onPress={() => router.push('/waitlist/application')}
+              >
+                <Text style={styles.joinButtonText}>Join Waitlist</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          {/* Title */}
-          <Text style={styles.title}>Intentional</Text>
-
-          {/* Description */}
-          <Text style={styles.description}>
-            Join our exclusive community of Intentional connections. No likes or
-            swipes anymore, no more being ghosted, only genuine relationships
-          </Text>
-
-          {/* Join Community Button */}
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={() => router.push('/waitlist/application')}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.primaryButtonText}>Join our community</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </SafeAreaView>
-    </LinearGradient>
+        </SafeAreaView>
+      </LinearGradient>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
+  },
   container: {
     flex: 1,
   },
-  safeArea: {
+  content: {
     flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 32,
-    paddingTop: 60,
-    paddingBottom: 40,
+    justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  logoContainer: {
-    marginBottom: 40,
-    alignItems: 'center',
+    paddingVertical: 60,
+    paddingHorizontal: 24,
   },
   logo: {
-    width: 120,
+    width: width * 0.6,
     height: 120,
+    marginTop: 40,
   },
-  title: {
-    fontSize: 42,
-    fontWeight: '300',
-    color: '#FFFFFF',
-    marginBottom: 24,
-    letterSpacing: 1.5,
-    textAlign: 'center',
-  },
-  description: {
-    fontSize: 16,
-    color: '#CCCCCC',
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 48,
-    paddingHorizontal: 8,
-  },
-  primaryButton: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 18,
-    paddingHorizontal: 48,
-    borderRadius: 30,
+  buttonContainer: {
     width: '100%',
-    maxWidth: 320,
+    marginBottom: 40,
+  },
+  joinButton: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 16,
+    borderRadius: 30,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -109,8 +90,8 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
-  primaryButtonText: {
-    color: '#1a1a1a',
+  joinButtonText: {
+    color: '#000000',
     fontSize: 18,
     fontWeight: '600',
     letterSpacing: 0.5,
