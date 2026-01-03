@@ -2,7 +2,7 @@
 import "react-native-reanimated";
 import React, { useEffect } from "react";
 import { useFonts } from "expo-font";
-import { Stack, router } from "expo-router";
+import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { SystemBars } from "react-native-edge-to-edge";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -17,13 +17,9 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { WidgetProvider } from "@/contexts/WidgetContext";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { BACKEND_URL, healthCheck } from "@/utils/api";
 
+// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
-
-export const unstable_settings = {
-  initialRouteName: "welcome",
-};
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -35,16 +31,6 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
-      
-      // Log backend URL and perform health check
-      console.log('[App] Backend URL configured:', BACKEND_URL);
-      healthCheck().then((healthy) => {
-        if (healthy) {
-          console.log('[App] ✅ Backend is healthy and reachable');
-        } else {
-          console.warn('[App] ⚠️ Backend health check failed');
-        }
-      });
     }
   }, [loaded]);
 
@@ -99,15 +85,23 @@ export default function RootLayout() {
           <WidgetProvider>
             <GestureHandlerRootView>
               <Stack screenOptions={{ headerShown: false }}>
-                {/* Welcome video screen */}
-                <Stack.Screen name="welcome" />
+                {/* Entry point - Welcome video */}
+                <Stack.Screen name="index" options={{ headerShown: false }} />
                 
-                {/* Waitlist screens */}
-                <Stack.Screen name="waitlist/application" />
-                <Stack.Screen name="waitlist/pending" />
+                {/* Waitlist Flow */}
+                <Stack.Screen name="waitlist/application" options={{ headerShown: false }} />
+                <Stack.Screen name="waitlist/confirmation" options={{ headerShown: false }} />
 
                 {/* Main app with tabs */}
-                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+                {/* Auth screens */}
+                <Stack.Screen name="auth/sign-in" options={{ headerShown: false }} />
+                <Stack.Screen name="auth/sign-up" options={{ headerShown: false }} />
+                <Stack.Screen name="auth/profile-setup" options={{ headerShown: false }} />
+
+                {/* Chat */}
+                <Stack.Screen name="chat/[id]" options={{ headerShown: false }} />
 
                 {/* Modal Demo Screens */}
                 <Stack.Screen
@@ -115,7 +109,6 @@ export default function RootLayout() {
                   options={{
                     presentation: "modal",
                     title: "Standard Modal",
-                    headerShown: true,
                   }}
                 />
                 <Stack.Screen
@@ -123,7 +116,6 @@ export default function RootLayout() {
                   options={{
                     presentation: "formSheet",
                     title: "Form Sheet Modal",
-                    headerShown: true,
                     sheetGrabberVisible: true,
                     sheetAllowedDetents: [0.5, 0.8, 1.0],
                     sheetCornerRadius: 20,
@@ -133,6 +125,7 @@ export default function RootLayout() {
                   name="transparent-modal"
                   options={{
                     presentation: "transparentModal",
+                    headerShown: false,
                   }}
                 />
               </Stack>

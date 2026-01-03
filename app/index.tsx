@@ -1,73 +1,195 @@
 
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, Dimensions, ActivityIndicator, Text } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
 import { StatusBar } from 'expo-status-bar';
+import Constants from 'expo-constants';
 
 const { width, height } = Dimensions.get('window');
+const BACKEND_URL = Constants.expoConfig?.extra?.backendUrl || 'https://erm5magsz6azuge4mtdkxhsmzj7uqr45.app.specular.dev';
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const videoRef = useRef<Video>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadVideo();
+  }, []);
+
+  const loadVideo = async () => {
+    try {
+      console.log('[Welcome] Starting video generation...');
+      console.log('[Welcome] Backend URL:', BACKEND_URL);
+      
+      // Generate video
+      const generateResponse = await fetch(`${BACKEND_URL}/api/video/generate`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: 'A young couple on a romantic date in the evening in New York City, cinematic, warm lighting, urban background'
+        })
+      });
+
+      console.log('[Welcome] Generate response status:', generateResponse.status);
+
+      if (!generateResponse.ok) {
+        const errorText = await generateResponse.text();
+        console.error('[Welcome] Generate error:', errorText);
+        throw new Error(`Video generation failed: ${generateResponse.status}`);
+      }
+
+      const generateData = await generateResponse.json();
+      console.log('[Welcome] Generate response:', generateData);
+      
+      const videoId = generateData.videoId || generateData.id;
+      
+      if (!videoId) {
+        throw new Error('No video ID returned from server');
+      }
+
+      console.log('[Welcome] Video ID:', videoId);
+
+      // Poll for video status
+      await pollVideoStatus(videoId);
+    } catch (err) {
+      console.error('[Welcome] Error loading video:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load video');
+      setLoading(false);
+      // Skip to application after 3 seconds on error
+      setTimeout(() => {
+        console.log('[Welcome] Navigating to application due to error');
+        router.replace('/waitlist/application');
+      }, 3000);
+    }
+  };
+
+  const pollVideoStatus = async (videoId: string) => {
+    const maxAttempts = 60; // 60 attempts = 1 minute
+    let attempts = 0;
+
+    const poll = async (): Promise<void> => {
+      try {
+        console.log(`[Welcome] Polling video status (attempt ${attempts + 1}/${maxAttempts})...`);
+        
+        const response = await fetch(`${BACKEND_URL}/api/video/status/${videoId}`, {
+          headers: {
+            'Accept': 'application/json',
+          }
+        });
+        
+        console.log('[Welcome] Status response:', response.status);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('[Welcome] Status error:', errorText);
+          throw new Error(`Status check failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('[Welcome] Video status:', data.status, data);
+
+        if (data.status === 'completed' && data.url) {
+          console.log('[Welcome] Video ready:', data.url);
+          setVideoUrl(data.url);
+          setLoading(false);
+          return;
+        }
+
+        if (data.status === 'failed') {
+          throw new Error('Video generation failed on server');
+        }
+
+        // Continue polling
+        attempts++;
+        if (attempts < maxAttempts) {
+          setTimeout(() => poll(), 2000); // Poll every 2 seconds
+        } else {
+          throw new Error('Video generation timeout - taking too long');
+        }
+      } catch (err) {
+        console.error('[Welcome] Polling error:', err);
+        setError(err instanceof Error ? err.message : 'Failed to check video status');
+        setLoading(false);
+        setTimeout(() => {
+          console.log('[Welcome] Navigating to application due to polling error');
+          router.replace('/waitlist/application');
+        }, 2000);
+      }
+    };
+
+    poll();
+  };
+
+  const handlePlaybackStatusUpdate = (status: AVPlaybackStatus) => {
+    if (status.isLoaded) {
+      console.log('[Welcome] Video playback status:', {
+        isPlaying: status.isPlaying,
+        didJustFinish: status.didJustFinish,
+        positionMillis: status.positionMillis,
+        durationMillis: status.durationMillis,
+      });
+      
+      if (status.didJustFinish) {
+        console.log('[Welcome] Video finished, navigating to application');
+        router.replace('/waitlist/application');
+      }
+    } else {
+      console.log('[Welcome] Video not loaded:', status);
+    }
+  };
+
+  const handleVideoError = (error: string) => {
+    console.error('[Welcome] Video playback error:', error);
+    setError('Video playback failed');
+    setTimeout(() => {
+      console.log('[Welcome] Navigating to application due to playback error');
+      router.replace('/waitlist/application');
+    }, 2000);
+  };
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <StatusBar style="light" />
+        <Text style={styles.errorText}>Loading your experience...</Text>
+        <Text style={styles.errorSubtext}>{error}</Text>
+        <ActivityIndicator size="large" color="#fff" style={{ marginTop: 20 }} />
+        <Text style={styles.skipText}>Continuing to application...</Text>
+      </View>
+    );
+  }
+
+  if (loading || !videoUrl) {
+    return (
+      <View style={styles.container}>
+        <StatusBar style="light" />
+        <ActivityIndicator size="large" color="#fff" />
+        <Text style={styles.loadingText}>Preparing your experience...</Text>
+        <Text style={styles.loadingSubtext}>Generating welcome video</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
-      <LinearGradient
-        colors={['#1a1a1a', '#000000']}
-        style={styles.gradient}
-      >
-        <SafeAreaView style={styles.safeArea}>
-          <View style={styles.content}>
-            {/* Logo */}
-            <View style={styles.logoContainer}>
-              <Image
-                source={require('../assets/images/final_quest_240x240.png')}
-                style={styles.logo}
-                resizeMode="contain"
-              />
-            </View>
-
-            {/* App Name */}
-            <Text style={styles.appName}>Intentional</Text>
-            <Text style={styles.tagline}>Dating with Purpose</Text>
-
-            {/* Description */}
-            <View style={styles.descriptionContainer}>
-              <Text style={styles.description}>
-                Join an exclusive community where meaningful connections begin with genuine conversation.
-              </Text>
-            </View>
-
-            {/* CTA Button */}
-            <TouchableOpacity
-              style={styles.ctaButton}
-              onPress={() => router.push('/waitlist/application')}
-              activeOpacity={0.9}
-            >
-              <LinearGradient
-                colors={['#ffffff', '#f0f0f0']}
-                style={styles.buttonGradient}
-              >
-                <Text style={styles.buttonText}>Apply to Join the Community</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            {/* Footer */}
-            <Text style={styles.footer}>
-              Limited access • Curated community • Verified members
-            </Text>
-          </View>
-        </SafeAreaView>
-      </LinearGradient>
+      <Video
+        ref={videoRef}
+        source={{ uri: videoUrl }}
+        style={styles.video}
+        resizeMode={ResizeMode.COVER}
+        shouldPlay
+        isLooping={false}
+        onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
+        onError={handleVideoError}
+      />
     </View>
   );
 }
@@ -75,83 +197,42 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
-  },
-  gradient: {
-    flex: 1,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    alignItems: 'center',
+    backgroundColor: '#000',
     justifyContent: 'center',
-    paddingHorizontal: 32,
-  },
-  logoContainer: {
-    marginBottom: 32,
-    shadowColor: '#ffffff',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-  },
-  logo: {
-    width: 120,
-    height: 120,
-  },
-  appName: {
-    fontSize: 48,
-    fontWeight: '300',
-    color: '#ffffff',
-    letterSpacing: 2,
-    marginBottom: 8,
-  },
-  tagline: {
-    fontSize: 16,
-    color: '#999999',
-    letterSpacing: 4,
-    textTransform: 'uppercase',
-    marginBottom: 48,
-  },
-  descriptionContainer: {
-    marginBottom: 64,
-    maxWidth: 340,
-  },
-  description: {
-    fontSize: 17,
-    color: '#cccccc',
-    textAlign: 'center',
-    lineHeight: 26,
-    fontWeight: '400',
-  },
-  ctaButton: {
-    width: '100%',
-    maxWidth: 340,
-    marginBottom: 32,
-    borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#ffffff',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  buttonGradient: {
-    paddingVertical: 18,
-    paddingHorizontal: 32,
     alignItems: 'center',
   },
-  buttonText: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#000000',
-    letterSpacing: 0.5,
+  video: {
+    width,
+    height,
   },
-  footer: {
-    fontSize: 12,
-    color: '#666666',
+  loadingText: {
+    color: '#fff',
+    fontSize: 18,
+    marginTop: 20,
+    fontWeight: '600',
+  },
+  loadingSubtext: {
+    color: '#999',
+    fontSize: 14,
+    marginTop: 8,
+  },
+  errorText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
     textAlign: 'center',
-    letterSpacing: 1,
+    paddingHorizontal: 40,
+  },
+  errorSubtext: {
+    color: '#999',
+    fontSize: 14,
+    marginTop: 8,
+    textAlign: 'center',
+    paddingHorizontal: 40,
+  },
+  skipText: {
+    color: '#666',
+    fontSize: 12,
+    marginTop: 20,
   },
 });

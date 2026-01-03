@@ -1,41 +1,35 @@
+
 {
   "expo": {
     "name": "Intentional",
     "slug": "intentional-dating",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/c16dda65-bb0d-4cb6-ba78-d87103621eb0.png",
+    "icon": "./assets/images/natively-dark.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/c16dda65-bb0d-4cb6-ba78-d87103621eb0.png",
+      "image": "./assets/images/natively-dark.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1a1a2e"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.intentional.dating",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false,
-        "NSCameraUsageDescription": "We need access to your camera to take profile photos",
-        "NSPhotoLibraryUsageDescription": "We need access to your photo library to select profile photos"
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/c16dda65-bb0d-4cb6-ba78-d87103621eb0.png",
-        "backgroundColor": "#1a1a2e"
+        "foregroundImage": "./assets/images/natively-dark.png",
+        "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.intentional.dating",
-      "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
-      ]
+      "package": "com.intentional.dating"
     },
     "web": {
-      "favicon": "./assets/images/c16dda65-bb0d-4cb6-ba78-d87103621eb0.png",
+      "favicon": "./assets/images/final_quest_240x240.png",
       "bundler": "metro"
     },
     "plugins": [
