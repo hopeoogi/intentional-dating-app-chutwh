@@ -22,10 +22,13 @@ const RELATIONSHIP_GOALS = [
   'Marriage',
   'Life partner',
   'Serious dating',
+  'Open to possibilities',
 ];
 
 export default function ApplicationScreen() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [age, setAge] = useState('');
@@ -36,82 +39,53 @@ export default function ApplicationScreen() {
   const [phone, setPhone] = useState('');
   const [lookingFor, setLookingFor] = useState<string[]>([]);
   const [additionalInfo, setAdditionalInfo] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const toggleLookingFor = (option: string) => {
-    console.log('[Application] Toggling option:', option);
-    setLookingFor((prev) =>
+    setLookingFor(prev =>
       prev.includes(option)
-        ? prev.filter((item) => item !== option)
+        ? prev.filter(item => item !== option)
         : [...prev, option]
     );
   };
 
   const handleSubmit = async () => {
-    console.log('[Application] Submit button pressed');
-    
     // Validation
     if (!firstName.trim() || !lastName.trim()) {
-      console.log('[Application] Validation failed: Name missing');
       Alert.alert('Error', 'Please enter your full name');
       return;
     }
 
     const ageNum = parseInt(age);
     if (!age || isNaN(ageNum) || ageNum < 18 || ageNum > 100) {
-      console.log('[Application] Validation failed: Invalid age');
       Alert.alert('Error', 'Please enter a valid age (18-100)');
       return;
     }
 
     if (!city.trim() || !provinceState.trim() || !country.trim()) {
-      console.log('[Application] Validation failed: Location missing');
       Alert.alert('Error', 'Please enter your complete location');
       return;
     }
 
     if (!email.trim() || !email.includes('@')) {
-      console.log('[Application] Validation failed: Invalid email');
       Alert.alert('Error', 'Please enter a valid email address');
       return;
     }
 
     if (lookingFor.length === 0) {
-      console.log('[Application] Validation failed: No relationship goals selected');
       Alert.alert('Error', 'Please select at least one relationship goal');
       return;
     }
 
-    console.log('[Application] All validations passed');
-    console.log('[Application] Backend configured:', isBackendConfigured());
-    console.log('[Application] Backend URL:', BACKEND_URL);
-
-    // Check backend configuration
     if (!isBackendConfigured()) {
-      console.log('[Application] Backend not configured, showing alert');
-      Alert.alert(
-        'Backend Not Configured',
-        'The backend is not yet configured. Please wait for deployment to complete.',
-        [
-          {
-            text: 'Continue Anyway',
-            onPress: () => {
-              console.log('[Application] User chose to continue without backend');
-              console.log('[Application] Navigating to confirmation screen');
-              router.push('/waitlist/confirmation');
-            },
-          },
-          { text: 'Cancel', style: 'cancel' },
-        ]
-      );
+      Alert.alert('Error', 'Backend not configured. Please contact support.');
+      console.error('[Application] Backend URL:', BACKEND_URL);
       return;
     }
 
     setLoading(true);
-    console.log('[Application] Starting submission process');
 
     try {
-      const applicationData = {
+      const payload = {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         age: ageNum,
@@ -124,40 +98,32 @@ export default function ApplicationScreen() {
         additionalInfo: additionalInfo.trim() || undefined,
       };
 
-      console.log('[Application] Submitting data:', JSON.stringify(applicationData, null, 2));
+      console.log('[Application] Submitting to:', `${BACKEND_URL}/api/waitlist/apply`);
+      console.log('[Application] Payload:', payload);
 
-      const response = await apiPost('/api/waitlist/apply', applicationData);
+      const response = await apiPost('/api/waitlist/apply', payload);
       
-      console.log('[Application] API response received:', response);
-      console.log('[Application] Submission successful!');
+      console.log('[Application] Success:', response);
       
-      Alert.alert('Success', 'Application submitted successfully!', [
-        {
-          text: 'OK',
-          onPress: () => {
-            console.log('[Application] Navigating to confirmation screen');
-            router.push('/waitlist/confirmation');
-          },
-        },
-      ]);
+      // Navigate to confirmation screen
+      router.push('/waitlist/confirmation');
     } catch (error: any) {
-      console.error('[Application] Submission error:', error);
-      console.error('[Application] Error message:', error.message);
-      console.error('[Application] Error stack:', error.stack);
-      
+      console.error('[Application] Submit error:', error);
       Alert.alert(
-        'Submission Error',
-        error.message || 'Failed to submit application. Please try again.'
+        'Submission Failed',
+        error.message || 'Unable to submit application. Please try again.'
       );
     } finally {
       setLoading(false);
-      console.log('[Application] Submission process completed');
     }
   };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <LinearGradient colors={['#000000', '#1a1a1a']} style={styles.gradient}>
+      <LinearGradient
+        colors={['#1a1a1a', '#0a0a0a']}
+        style={styles.gradient}
+      >
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.keyboardView}
@@ -180,7 +146,7 @@ export default function ApplicationScreen() {
                     style={styles.input}
                     value={firstName}
                     onChangeText={setFirstName}
-                    placeholder="John"
+                    placeholder="First"
                     placeholderTextColor="#666"
                   />
                 </View>
@@ -190,7 +156,7 @@ export default function ApplicationScreen() {
                     style={styles.input}
                     value={lastName}
                     onChangeText={setLastName}
-                    placeholder="Doe"
+                    placeholder="Last"
                     placeholderTextColor="#666"
                   />
                 </View>
@@ -211,7 +177,7 @@ export default function ApplicationScreen() {
                 style={styles.input}
                 value={city}
                 onChangeText={setCity}
-                placeholder="Toronto"
+                placeholder="New York"
                 placeholderTextColor="#666"
               />
 
@@ -220,7 +186,7 @@ export default function ApplicationScreen() {
                 style={styles.input}
                 value={provinceState}
                 onChangeText={setProvinceState}
-                placeholder="Ontario"
+                placeholder="NY"
                 placeholderTextColor="#666"
               />
 
@@ -229,7 +195,7 @@ export default function ApplicationScreen() {
                 style={styles.input}
                 value={country}
                 onChangeText={setCountry}
-                placeholder="Canada"
+                placeholder="United States"
                 placeholderTextColor="#666"
               />
 
@@ -238,7 +204,7 @@ export default function ApplicationScreen() {
                 style={styles.input}
                 value={email}
                 onChangeText={setEmail}
-                placeholder="john@example.com"
+                placeholder="you@example.com"
                 placeholderTextColor="#666"
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -277,7 +243,7 @@ export default function ApplicationScreen() {
                 ))}
               </View>
 
-              <Text style={styles.label}>Additional Information (Optional)</Text>
+              <Text style={styles.label}>Additional Info (Optional)</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
                 value={additionalInfo}
@@ -328,7 +294,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#fff',
     marginBottom: 8,
   },
@@ -367,23 +333,25 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   optionsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 12,
   },
   option: {
-    backgroundColor: '#1a1a1a',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: '#333',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: '#1a1a1a',
   },
   optionSelected: {
     backgroundColor: '#fff',
     borderColor: '#fff',
   },
   optionText: {
-    fontSize: 16,
-    color: '#fff',
-    textAlign: 'center',
+    fontSize: 14,
+    color: '#999',
   },
   optionTextSelected: {
     color: '#000',
@@ -400,8 +368,8 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   submitButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '700',
     color: '#000',
   },
 });

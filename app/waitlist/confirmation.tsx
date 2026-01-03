@@ -11,30 +11,35 @@ export default function ConfirmationScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <LinearGradient colors={['#000000', '#1a1a1a']} style={styles.gradient}>
+      <LinearGradient
+        colors={['#1a1a1a', '#0a0a0a']}
+        style={styles.gradient}
+      >
         <View style={styles.content}>
           <View style={styles.iconContainer}>
             <IconSymbol 
               ios_icon_name="checkmark.circle.fill" 
               android_material_icon_name="check-circle" 
               size={80} 
-              color="#fff" 
+              color="#4CAF50" 
             />
           </View>
 
-          <Text style={styles.title}>Application Submitted!</Text>
+          <Text style={styles.title}>You&apos;re on the list!</Text>
+          
           <Text style={styles.message}>
-            Thank you for your interest in joining our exclusive community.
+            Thank you for applying to join our exclusive community of intentional connections.
           </Text>
+
           <Text style={styles.submessage}>
             We&apos;ll review your application and get back to you soon via email.
           </Text>
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push('/waitlist/welcome')}
+            onPress={() => router.replace('/')}
           >
-            <Text style={styles.buttonText}>Back to Home</Text>
+            <Text style={styles.buttonText}>Done</Text>
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -61,34 +66,36 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#fff',
     marginBottom: 16,
     textAlign: 'center',
   },
   message: {
     fontSize: 18,
-    color: '#999',
+    color: '#ccc',
     textAlign: 'center',
     marginBottom: 12,
-    paddingHorizontal: 20,
+    lineHeight: 26,
   },
   submessage: {
     fontSize: 16,
-    color: '#666',
+    color: '#999',
     textAlign: 'center',
     marginBottom: 48,
-    paddingHorizontal: 20,
+    lineHeight: 24,
   },
   button: {
     backgroundColor: '#fff',
     borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 48,
+    minWidth: 200,
+    alignItems: 'center',
   },
   buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '700',
     color: '#000',
   },
 });
