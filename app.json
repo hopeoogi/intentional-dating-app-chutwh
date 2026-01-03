@@ -1,7 +1,8 @@
+
 {
   "expo": {
     "name": "Intentional Dating",
-    "slug": "Intentional Dating",
+    "slug": "intentional-dating",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/natively-dark.png",
@@ -16,8 +17,12 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.intentional.dating",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "We need access to your photo library to let you upload profile photos.",
+        "NSCameraUsageDescription": "We need access to your camera to let you take profile photos.",
+        "NSLocationWhenInUseUsageDescription": "We use your location to show you matches nearby."
+      },
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
@@ -25,7 +30,15 @@
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.intentional.dating"
+      "package": "com.intentional.dating",
+      "versionCode": 1,
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/images/natively-dark.png",
@@ -34,7 +47,14 @@
     "plugins": [
       "expo-font",
       "expo-router",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "We need access to your photos to let you upload profile pictures.",
+          "cameraPermission": "We need access to your camera to let you take profile pictures."
+        }
+      ]
     ],
     "scheme": "intentional",
     "experiments": {
@@ -42,8 +62,18 @@
     },
     "extra": {
       "router": {},
-      "backendUrl": "https://erm5magsz6azuge4mtdkxhsmzj7uqr45.app.specular.dev"
+      "backendUrl": "https://erm5magsz6azuge4mtdkxhsmzj7uqr45.app.specular.dev",
+      "eas": {
+        "projectId": "your-project-id-here"
+      }
+    },
+    "owner": "your-expo-username",
+    "privacy": "unlisted",
+    "updates": {
+      "url": "https://u.expo.dev/your-project-id-here"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
-  },
-  "scheme": "Intentional Dating"
+  }
 }
