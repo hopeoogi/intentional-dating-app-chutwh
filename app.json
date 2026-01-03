@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "Intentional Dating",
+    "slug": "intentional-dating",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/4d0f378c-70e0-4a39-bf69-e51a95b5c630.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/4d0f378c-70e0-4a39-bf69-e51a95b5c630.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0A"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.intentionaldating.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/4d0f378c-70e0-4a39-bf69-e51a95b5c630.png",
+        "backgroundColor": "#0A0A0A"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.intentionaldating.app"
+    },
+    "web": {
+      "favicon": "./assets/images/4d0f378c-70e0-4a39-bf69-e51a95b5c630.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-font",
+      "expo-router",
+      "expo-web-browser",
+      "expo-secure-store"
+    ],
+    "scheme": "natively",
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "backendUrl": "https://erm5magsz6azuge4mtdkxhsmzj7uqr45.app.specular.dev"
+    }
+  }
+}
