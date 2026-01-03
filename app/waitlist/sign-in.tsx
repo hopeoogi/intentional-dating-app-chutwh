@@ -1,84 +1,103 @@
 
 import React from 'react';
-import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  ImageBackground,
   Image,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export default function SignInScreen() {
   const router = useRouter();
 
   return (
-    <ImageBackground
-      source={require('@/assets/images/background.png')}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <SafeAreaView style={styles.container}>
+    <LinearGradient colors={['#1a1a1a', '#000000']} style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
           <Image
-            source={require('@/assets/images/intentional-logo.png')}
+            source={require('@/assets/images/logo.png')}
             style={styles.logo}
             resizeMode="contain"
           />
 
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => router.push('/waitlist/application')}
-            >
-              <Text style={styles.buttonText}>Join Waitlist</Text>
-            </TouchableOpacity>
-          </View>
+          <Text style={styles.title}>Welcome to Intentional</Text>
+          <Text style={styles.description}>
+            A conversation-first dating experience. No swipes, no games—just
+            meaningful connections.
+          </Text>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => router.push('/waitlist/application')}
+          >
+            <Text style={styles.buttonText}>Apply to Join</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => router.back()}>
+            <Text style={styles.backText}>← Back</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
-    </ImageBackground>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
   container: {
+    flex: 1,
+  },
+  safeArea: {
     flex: 1,
   },
   content: {
     flex: 1,
-    justifyContent: 'space-between',
+    paddingHorizontal: 32,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 60,
   },
   logo: {
-    width: width * 0.6,
+    width: 120,
     height: 120,
-    marginTop: 40,
+    marginBottom: 32,
   },
-  buttonContainer: {
-    width: '100%',
-    paddingHorizontal: 40,
-    marginBottom: 40,
+  title: {
+    fontSize: 32,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  description: {
+    fontSize: 16,
+    color: '#CCCCCC',
+    textAlign: 'center',
+    marginBottom: 48,
+    lineHeight: 24,
+    paddingHorizontal: 16,
   },
   button: {
-    backgroundColor: '#000',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 48,
     paddingVertical: 16,
     borderRadius: 30,
+    width: width - 64,
     alignItems: 'center',
+    marginBottom: 24,
   },
   buttonText: {
-    color: '#FFF',
+    color: '#000000',
     fontSize: 18,
     fontWeight: '600',
+  },
+  backText: {
+    color: '#FFFFFF',
+    fontSize: 16,
   },
 });
