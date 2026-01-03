@@ -8,30 +8,31 @@ import {
   ImageBackground,
   Image,
   Dimensions,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export default function SignInScreen() {
   const router = useRouter();
 
   return (
     <ImageBackground
-      source={require('@/assets/images/d45a04a7-5fce-423f-af69-1e7c41804f69.jpeg')}
+      source={require('@/assets/images/natively-dark.png')}
       style={styles.background}
       resizeMode="cover"
     >
       <LinearGradient
-        colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.7)']}
-        style={styles.overlay}
+        colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.8)']}
+        style={styles.gradient}
       >
         <SafeAreaView style={styles.container}>
           <View style={styles.content}>
             <Image
-              source={require('@/assets/images/260cc1c3-9577-4d6b-bb49-5785013cf9ac.png')}
+              source={require('@/assets/images/final_quest_240x240.png')}
               style={styles.logo}
               resizeMode="contain"
             />
@@ -39,15 +40,15 @@ export default function SignInScreen() {
             <Text style={styles.description}>
               Join our exclusive community of Intentional connections. No likes or swipes anymore, no more being ghosted, only genuine relationships
             </Text>
-            
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.joinButton}
-                onPress={() => router.push('/waitlist/application')}
-              >
-                <Text style={styles.joinButtonText}>Join Waitlist</Text>
-              </TouchableOpacity>
-            </View>
+          </View>
+
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => router.push('/waitlist/application')}
+            >
+              <Text style={styles.buttonText}>Join Waitlist</Text>
+            </TouchableOpacity>
           </View>
         </SafeAreaView>
       </LinearGradient>
@@ -61,41 +62,39 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  overlay: {
+  gradient: {
     flex: 1,
   },
   container: {
     flex: 1,
+    justifyContent: 'space-between',
+    paddingBottom: Platform.OS === 'ios' ? 40 : 20,
   },
   content: {
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 24,
+    paddingHorizontal: 32,
   },
   logo: {
-    width: width * 0.6,
+    width: 120,
     height: 120,
-    marginTop: 40,
+    marginBottom: 32,
   },
   description: {
-    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '400',
+    color: '#FFFFFF',
     textAlign: 'center',
     lineHeight: 24,
-    paddingHorizontal: 20,
-    marginTop: -80,
-    letterSpacing: 0.3,
+    opacity: 0.95,
+    fontWeight: '400',
   },
   buttonContainer: {
-    width: '100%',
-    marginBottom: 40,
+    paddingHorizontal: 24,
   },
-  joinButton: {
+  button: {
     backgroundColor: '#FFFFFF',
-    paddingVertical: 16,
+    paddingVertical: 18,
     borderRadius: 30,
     alignItems: 'center',
     shadowColor: '#000',
@@ -104,10 +103,9 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
-  joinButtonText: {
+  buttonText: {
     color: '#000000',
     fontSize: 18,
     fontWeight: '600',
-    letterSpacing: 0.5,
   },
 });

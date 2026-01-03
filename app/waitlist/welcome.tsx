@@ -7,7 +7,9 @@ import {
   ImageBackground,
   TouchableOpacity,
   Dimensions,
+  Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -18,40 +20,47 @@ export default function WelcomeScreen() {
 
   return (
     <ImageBackground
-      source={require('@/assets/images/1a782e7d-0165-4270-bbc7-3a0d29c7b7d7.jpeg')}
-      style={styles.container}
+      source={require('@/assets/images/natively-dark.png')}
+      style={styles.background}
       resizeMode="cover"
     >
       <LinearGradient
-        colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.5)']}
-        style={styles.overlay}
+        colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
+        style={styles.gradient}
       >
-        <View style={styles.content}>
-          <Text style={styles.title}>Intentional</Text>
-        </View>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.content}>
+            <Text style={styles.title}>Intentional</Text>
+            <Text style={styles.subtitle}>Dating with Purpose</Text>
+          </View>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => router.push('/waitlist/sign-in')}
-        >
-          <Text style={styles.buttonText}>Join Our Community</Text>
-        </TouchableOpacity>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => router.push('/waitlist/sign-in')}
+            >
+              <Text style={styles.buttonText}>Get Started</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
       </LinearGradient>
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
     width: '100%',
     height: '100%',
   },
-  overlay: {
+  gradient: {
+    flex: 1,
+  },
+  container: {
     flex: 1,
     justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 80,
+    paddingBottom: Platform.OS === 'ios' ? 40 : 20,
   },
   content: {
     flex: 1,
@@ -60,16 +69,30 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 56,
-    fontWeight: '300',
+    fontWeight: '700',
     color: '#FFFFFF',
-    letterSpacing: 2,
+    marginBottom: 12,
+    letterSpacing: -1,
+  },
+  subtitle: {
+    fontSize: 20,
+    color: '#FFFFFF',
+    opacity: 0.9,
+    fontWeight: '400',
+  },
+  buttonContainer: {
+    paddingHorizontal: 24,
   },
   button: {
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 48,
-    paddingVertical: 16,
+    paddingVertical: 18,
     borderRadius: 30,
-    marginBottom: 40,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
   buttonText: {
     color: '#000000',

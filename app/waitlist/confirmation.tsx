@@ -1,65 +1,69 @@
 
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { IconSymbol } from '@/components/IconSymbol';
 
 export default function ConfirmationScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <LinearGradient
-        colors={['#1a1a1a', '#0a0a0a']}
-        style={styles.gradient}
-      >
+    <LinearGradient colors={['#000000', '#1a1a1a']} style={styles.gradient}>
+      <SafeAreaView style={styles.container}>
         <View style={styles.content}>
           <View style={styles.iconContainer}>
-            <IconSymbol 
-              ios_icon_name="checkmark.circle.fill" 
-              android_material_icon_name="check-circle" 
-              size={80} 
-              color="#4CAF50" 
-            />
+            <IconSymbol name="checkmark.circle.fill" size={80} color="#4CAF50" />
           </View>
 
-          <Text style={styles.title}>You&apos;re on the list!</Text>
-          
+          <Text style={styles.title}>You're on the list!</Text>
           <Text style={styles.message}>
-            Thank you for applying to join our exclusive community of intentional connections.
+            Thank you for applying to Intentional. We'll review your application
+            and get back to you soon via email.
           </Text>
 
-          <Text style={styles.submessage}>
-            We&apos;ll review your application and get back to you soon via email.
-          </Text>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => router.replace('/')}
-          >
-            <Text style={styles.buttonText}>Done</Text>
-          </TouchableOpacity>
+          <View style={styles.infoBox}>
+            <Text style={styles.infoTitle}>What's Next?</Text>
+            <Text style={styles.infoText}>
+              • We'll review your application within 48 hours{'\n'}
+              • You'll receive an email with your approval status{'\n'}
+              • Approved members get early access to the app
+            </Text>
+          </View>
         </View>
-      </LinearGradient>
-    </SafeAreaView>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => router.replace('/(tabs)')}
+        >
+          <Text style={styles.buttonText}>Done</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
   gradient: {
     flex: 1,
+  },
+  container: {
+    flex: 1,
+    padding: 24,
+    justifyContent: 'space-between',
+    paddingBottom: Platform.OS === 'ios' ? 40 : 20,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
   },
   iconContainer: {
     marginBottom: 32,
@@ -67,35 +71,51 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#fff',
+    color: '#FFFFFF',
     marginBottom: 16,
     textAlign: 'center',
   },
   message: {
-    fontSize: 18,
-    color: '#ccc',
-    textAlign: 'center',
-    marginBottom: 12,
-    lineHeight: 26,
-  },
-  submessage: {
     fontSize: 16,
     color: '#999',
     textAlign: 'center',
-    marginBottom: 48,
     lineHeight: 24,
+    marginBottom: 32,
+    paddingHorizontal: 20,
+  },
+  infoBox: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 16,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: '#333',
+    width: '100%',
+  },
+  infoTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 12,
+  },
+  infoText: {
+    fontSize: 14,
+    color: '#999',
+    lineHeight: 22,
   },
   button: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 48,
-    minWidth: 200,
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 18,
+    borderRadius: 30,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
   buttonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#000',
+    color: '#000000',
+    fontSize: 18,
+    fontWeight: '600',
   },
 });
